@@ -62,7 +62,7 @@ export function middleware(request: NextRequest) {
   // --- 3. Portfolio Subdomains or Custom Domains ---
   const isVercel = hostname.endsWith('.vercel.app');
   const isWWW = subdomain === 'www';
-  if ((subdomain && !isWWW) || (hostname !== rootDomain && !isLocalhost && !isVercel)) {
+  if (!isWWW && (subdomain || (hostname !== rootDomain && !isLocalhost && !isVercel))) {
     let identifier = subdomain || hostname;
 
     // Handle chat subdomain specifically (e.g. chat.veer.nexid.in -> chat.veer)
