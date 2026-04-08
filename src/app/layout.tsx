@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+export const dynamic = 'force-dynamic';
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -82,6 +83,8 @@ const jsonLd = {
   },
 };
 
+import { AuthProvider } from '@/lib/auth-context';
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -104,7 +107,7 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased overflow-x-hidden font-['Inter',system-ui,sans-serif]">
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
