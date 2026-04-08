@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-export const dynamic = 'force-dynamic';
 import "./globals.css";
 
 export const metadata: Metadata = {
