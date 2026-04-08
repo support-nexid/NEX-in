@@ -3,12 +3,14 @@
 import React, { useState } from 'react';
 
 interface Props {
-  onUploadSuccess: (url: string) => void;
+  onSuccess: (url: string) => void;
   className?: string;
+  folder?: string;
+  buttonLabel?: string;
   preset?: string;
 }
 
-export function ImageUpload({ onUploadSuccess, className = "", preset = "nexid_avatars" }: Props) {
+export default function ImageUpload({ onSuccess, className = "", folder = "", buttonLabel = "Upload", preset = "nexid_avatars" }: Props) {
   const [uploading, setUploading] = useState(false);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,7 +41,7 @@ export function ImageUpload({ onUploadSuccess, className = "", preset = "nexid_a
       if (!uploadRes.ok) throw new Error("Failed to upload to Cloudinary");
       const data = await uploadRes.json();
       
-      onUploadSuccess(data.secure_url);
+      onSuccess(data.secure_url);
     } catch (error) {
       console.error(error);
       alert("Error uploading image. Please try again.");

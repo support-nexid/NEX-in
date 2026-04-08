@@ -10,7 +10,7 @@ interface Props {
   description?: string;
 }
 
-export function VisitorAuthModal({ isOpen, onClose, title = "Sign in to interact", description = "You need to verify your identity to perform this action." }: Props) {
+export default function VisitorAuthModal({ isOpen, onClose, title = "Sign in to interact", description = "You need to verify your identity to perform this action." }: Props) {
   const { signInWithGoogle } = useAuth();
   const [loading, setLoading] = useState(false);
 
