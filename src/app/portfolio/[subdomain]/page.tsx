@@ -145,10 +145,35 @@ export default function PortfolioPage({ params }: { params: { subdomain: string 
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-[#050505] text-white">
-        <div className="w-16 h-16 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin mb-4"></div>
-        <div className="text-gray-500 font-medium tracking-widest text-xs uppercase animate-pulse">Establishing Secure Connection...</div>
-        <div className="text-[10px] text-gray-700 mt-2 font-mono">Routing to V1 Database</div>
+      <div className="min-h-screen bg-[#050505] text-white p-8 animate-pulse">
+        <div className="max-w-4xl mx-auto space-y-12">
+          {/* Header Skeleton */}
+          <div className="flex flex-col md:flex-row items-center gap-8 mt-12">
+            <div className="w-32 h-32 md:w-48 md:h-48 rounded-3xl bg-white/5"></div>
+            <div className="space-y-4 flex-1 w-full text-center md:text-left">
+              <div className="h-10 bg-white/5 rounded-xl w-3/4 mx-auto md:mx-0"></div>
+              <div className="h-6 bg-white/5 rounded-lg w-1/2 mx-auto md:mx-0"></div>
+              <div className="flex gap-4 justify-center md:justify-start pt-4">
+                <div className="w-24 h-10 bg-white/5 rounded-xl"></div>
+                <div className="w-24 h-10 bg-white/5 rounded-xl"></div>
+              </div>
+            </div>
+          </div>
+          {/* Content Skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="md:col-span-2 space-y-4">
+              <div className="h-8 bg-white/5 rounded-xl w-1/3 mb-6"></div>
+              <div className="h-48 bg-white/5 rounded-xl w-full"></div>
+              <div className="h-48 bg-white/5 rounded-xl w-full"></div>
+            </div>
+            <div className="space-y-6">
+              <div className="h-8 bg-white/5 rounded-xl w-1/2 mb-4"></div>
+              <div className="h-16 bg-white/5 rounded-xl w-full"></div>
+              <div className="h-16 bg-white/5 rounded-xl w-full"></div>
+              <div className="h-16 bg-white/5 rounded-xl w-full"></div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
