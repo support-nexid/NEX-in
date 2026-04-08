@@ -1,0 +1,74 @@
+"use client";
+
+import React, { useState } from 'react';
+
+interface Props {
+  onUploadSuccess: (url: string) => void;
+  className?: string;
+  preset?: string;
+}
+
+export function ImageUpload({ onUploadSuccess, className = "", preset = "nexid_avatars" }: Props) {
+  const [uploading, setUploading] = useState(false);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    
+    const file = e.target.files[0];
+    setUploading(true);
+
+    try {
+      // 1. Get Signature from backend
+      const sigRes = await fetch('/api/cloudinary-sign');
+      if (!sigRes.ok) throw new Error("Failed to get signature");
+      const { timestamp, signature, apiKey, cloudName } = await sigRes.json();
+
+      // 2. Upload directly to Cloudinary from browser
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('api_key', apiKey);
+      formData.append('timestamp', timestamp);
+      formData.append('signature', signature);
+      formData.append('upload_preset', preset);
+
+      const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!uploadRes.ok) throw new Error("Failed to upload to Cloudinary");
+      const data = await uploadRes.json();
+      
+      onUploadSuccess(data.secure_url);
+    } catch (error) {
+      console.error(error);
+      alert("Error uploading image. Please try again.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div className={`relative ${className}`}>
+      <label className="flex items-center justify-center w-full h-full cursor-pointer group">
+        <input 
+          type="file" 
+          accept="image/*" 
+          onChange={handleFileChange} 
+          disabled={uploading}
+          className="hidden" 
+        />
+        {uploading ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-inherit">
+            <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+          </div>
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center transition-opacity opacity-0 bg-black/50 rounded-inherit group-hover:opacity-100">
+            <span className="text-xl">📷</span>
+            <span className="text-xs font-semibold text-white">Upload</span>
+          </div>
+        )}
+      </label>
+    </div>
+  );
+}

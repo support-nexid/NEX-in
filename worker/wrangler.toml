@@ -1,0 +1,11 @@
+name = "nexid-api-gatekeeper"
+main = "src/index.ts"
+compatibility_date = "2024-04-07"
+
+# Once you connect your Cloudflare account, uncomment routes to let the worker take over "api.nexid.in"
+# routes = [
+#   { pattern = "api.nexid.in/*", zone_name = "nexid.in" }
+# ]
+
+[vars]
+PROXY_SECRET = "nexid-dev-secret"
