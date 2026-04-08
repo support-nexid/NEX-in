@@ -19,7 +19,7 @@ export function middleware(request: NextRequest) {
   }
 
   // --- 0. Allow direct API access from subdomains & subdirectories ---
-  if (url.pathname.startsWith('/api') && subdomain !== 'api') {
+  if ((url.pathname.startsWith('/api') && subdomain !== 'api') || url.pathname.startsWith('/icon') || url.pathname.startsWith('/apple-icon')) {
     return NextResponse.next();
   }
 
