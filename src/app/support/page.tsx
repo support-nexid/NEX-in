@@ -191,7 +191,7 @@ function TicketQueueView() {
       {/* Ticket List */}
       <div className="space-y-3">
         {loading ? (
-          <div className="p-8 text-center text-gray-500 animate-pulse">Establishing Secure Stream...</div>
+          <div className="p-8 w-full space-y-4 animate-pulse"><div className="h-16 bg-white/5 rounded-xl w-full"></div><div className="h-16 bg-white/5 rounded-xl w-full"></div><div className="h-16 bg-white/5 rounded-xl w-full"></div></div>
         ) : filtered.length === 0 ? (
           <div className="p-16 text-center text-gray-500">No tickets found in this queue.</div>
         ) : filtered.map((t) => (

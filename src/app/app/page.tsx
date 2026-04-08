@@ -629,7 +629,7 @@ function InboxView() {
 
       <div className="glass-card rounded-2xl overflow-hidden hover:transform-none border border-white/5">
         {loading ? (
-          <div className="p-8 text-center text-gray-500 animate-pulse">Establishing Secure Stream...</div>
+          <div className="p-8 w-full space-y-4 animate-pulse"><div className="h-16 bg-white/5 rounded-xl w-full"></div><div className="h-16 bg-white/5 rounded-xl w-full"></div><div className="h-16 bg-white/5 rounded-xl w-full"></div></div>
         ) : messages.length === 0 ? (
           <div className="p-16 text-center">
             <div className="text-4xl mb-4">📭</div>

@@ -259,7 +259,7 @@ function UsersView() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={6} className="p-8 text-center text-gray-500 animate-pulse">Loading live active nodes...</td></tr>
+              <tr><td colSpan={6} className="p-8"><div className="w-full space-y-4 animate-pulse"><div className="h-12 bg-white/5 rounded-xl w-full"></div><div className="h-12 bg-white/5 rounded-xl w-full"></div><div className="h-12 bg-white/5 rounded-xl w-full"></div></div></td></tr>
             ) : mockUsers.filter(u => filter === 'all' || (u.is_active ? 'active' : 'suspended') === filter).map((user) => (
               <tr key={user.id} className="border-b border-white/[0.03] hover:bg-white/[0.02]">
                 <td className="p-4">
