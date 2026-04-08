@@ -19,7 +19,12 @@ export function middleware(request: NextRequest) {
   }
 
   // --- 0. Allow direct API access from subdomains & subdirectories ---
-  if ((url.pathname.startsWith('/api') && subdomain !== 'api') || url.pathname.startsWith('/icon') || url.pathname.startsWith('/apple-icon')) {
+  if (
+    (url.pathname.startsWith('/api') && subdomain !== 'api') || 
+    url.pathname.startsWith('/icon') || 
+    url.pathname.startsWith('/apple-icon') ||
+    url.pathname.startsWith('/__/') // Allow Firebase Auth Proxies
+  ) {
     return NextResponse.next();
   }
 
