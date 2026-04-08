@@ -82,7 +82,7 @@ const jsonLd = {
   },
 };
 
-import { AuthProvider } from '@/lib/auth-context';
+
 
 export default function RootLayout({
   children,
@@ -106,7 +106,7 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased overflow-x-hidden font-['Inter',system-ui,sans-serif]">
-        <AuthProvider>{children}</AuthProvider>
+        {children}
       </body>
     </html>
   );
