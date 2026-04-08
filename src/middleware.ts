@@ -18,6 +18,11 @@ export function middleware(request: NextRequest) {
     subdomain = hostname.split('.')[0];
   }
 
+  // --- 0. Allow direct API access from subdomains & subdirectories ---
+  if (url.pathname.startsWith('/api') && subdomain !== 'api') {
+    return NextResponse.next();
+  }
+
   // --- 1. API Protection Logic ---
   if (subdomain === 'api') {
     // If it's literally just the api homepage (api.nexid.in/), redirect to main domain
@@ -62,6 +67,15 @@ export function middleware(request: NextRequest) {
   // --- 3. Portfolio Subdomains or Custom Domains ---
   const isVercel = hostname.endsWith('.vercel.app');
   const isWWW = subdomain === 'www';
+
+  // Enable subdirectory access for system folders (e.g. nexid.in/app instead of app.nexid.in)
+  const basePath = url.pathname.split('/')[1]; // This is 'app' for '/app'
+  const internalFolders = ['app', 'auth', 'admin', 'support', 'chat'];
+  
+  if ((!subdomain || isWWW || isVercel) && internalFolders.includes(basePath)) {
+      return NextResponse.next();
+  }
+
   if (!isWWW && (subdomain || (hostname !== rootDomain && !isLocalhost && !isVercel))) {
     let identifier = subdomain || hostname;
 
