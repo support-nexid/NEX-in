@@ -1,7 +1,10 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
+import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
+/* ─────── Subdomain Search ─────── */
 export function SubdomainSearch() {
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState<{available?: boolean; message?: string; loading?: boolean}>({});
@@ -49,7 +52,7 @@ export function SubdomainSearch() {
           <button
             disabled={!status.available}
             className={`px-8 py-4 rounded-xl font-bold text-sm uppercase tracking-widest whitespace-nowrap transition-all duration-300 ${
-              status.available 
+              status.available
                 ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-[0_0_30px_rgba(99,102,241,0.4)] hover:-translate-y-0.5'
                 : 'bg-white/5 text-gray-500 cursor-not-allowed'
             }`}
@@ -71,6 +74,7 @@ export function SubdomainSearch() {
   );
 }
 
+/* ─────── FAQ Item ─────── */
 export function FAQItem({ question, answer }: { question: string; answer: string }) {
   const [open, setOpen] = useState(false);
   return (
@@ -86,8 +90,13 @@ export function FAQItem({ question, answer }: { question: string; answer: string
   );
 }
 
+/* ─────── Nav Menu (Auth-Aware) ─────── */
 export function NavMenu() {
   const [scrollY, setScrollY] = useState(0);
+  const [user, setUser] = useState<User | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -95,22 +104,113 @@ export function NavMenu() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      setAuthLoading(false);
+    });
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const handleSignOut = async () => {
+    await signOut(auth);
+    setDropdownOpen(false);
+    window.location.href = '/';
+  };
+
+  const initial = user?.displayName?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U';
+
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrollY > 50 ? 'bg-[#050505]/80 backdrop-blur-xl border-b border-white/5' : ''}`}>
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-2">
+        {/* Logo */}
+        <a href="/" className="flex items-center gap-2">
           <div className="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center font-black text-sm shadow-lg shadow-indigo-500/20">N</div>
           <span className="text-xl font-bold tracking-tight">NexId</span>
-        </div>
+        </a>
+
+        {/* Nav Links */}
         <div className="hidden md:flex items-center gap-8 text-sm font-medium">
           <a href="#features" className="text-gray-400 hover:text-white transition-colors">Features</a>
           <a href="#pricing" className="text-gray-400 hover:text-white transition-colors">Pricing</a>
           <a href="#faq" className="text-gray-400 hover:text-white transition-colors">FAQ</a>
           <a href="#testimonials" className="text-gray-400 hover:text-white transition-colors">Reviews</a>
         </div>
+
+        {/* Auth section */}
         <div className="flex items-center gap-3">
-          <a href="/auth" className="text-sm text-gray-400 hover:text-white font-medium transition-colors px-4 py-2">Sign In</a>
-          <a href="/app" className="btn-primary text-sm !py-2.5 !px-6">Get Started Free</a>
+          {authLoading ? (
+            <div className="w-9 h-9 rounded-full bg-white/5 animate-pulse" />
+          ) : user ? (
+            /* Logged in → Avatar + Dropdown */
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-2xl bg-white/5 border border-white/10 hover:border-indigo-500/40 hover:bg-white/10 transition-all"
+              >
+                {user.photoURL ? (
+                  <img
+                    src={user.photoURL}
+                    alt={user.displayName || 'Avatar'}
+                    className="w-8 h-8 rounded-full object-cover ring-2 ring-indigo-500/30"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-sm">
+                    {initial}
+                  </div>
+                )}
+                <span className="text-sm font-semibold text-white hidden sm:block max-w-[100px] truncate">
+                  {user.displayName?.split(' ')[0] || user.email?.split('@')[0]}
+                </span>
+                <svg
+                  className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {dropdownOpen && (
+                <div className="absolute right-0 top-full mt-2 w-56 bg-[#111] border border-white/10 rounded-2xl shadow-2xl shadow-black/60 overflow-hidden z-50 animate-fade-in">
+                  <div className="px-4 py-3 border-b border-white/5">
+                    <p className="text-xs text-gray-500 font-medium">Signed in as</p>
+                    <p className="text-sm font-bold text-white truncate">{user.email}</p>
+                  </div>
+                  <div className="p-2 space-y-0.5">
+                    <a href="/app" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">
+                      <span>🏠</span> Dashboard
+                    </a>
+                    <a href="/app" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors">
+                      <span>⚙️</span> Settings
+                    </a>
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-rose-400 hover:bg-rose-500/10 transition-colors"
+                    >
+                      <span>🚪</span> Sign Out
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* Logged out → Sign In + Get Started */
+            <>
+              <a href="/auth" className="text-sm text-gray-400 hover:text-white font-medium transition-colors px-4 py-2">Sign In</a>
+              <a href="/auth" className="btn-primary text-sm !py-2.5 !px-6">Get Started Free</a>
+            </>
+          )}
         </div>
       </div>
     </nav>

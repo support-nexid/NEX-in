@@ -74,8 +74,8 @@ export function middleware(request: NextRequest) {
   const isWWW = subdomain === 'www';
 
   // Enable subdirectory access for system folders (e.g. nexid.in/app instead of app.nexid.in)
-  const basePath = url.pathname.split('/')[1]; // This is 'app' for '/app'
-  const internalFolders = ['app', 'auth', 'admin', 'support', 'chat'];
+  const basePath = url.pathname.split('/')[1];
+  const internalFolders = ['app', 'auth', 'admin', 'support', 'chat', 'onboarding', 'portfolio'];
   
   if ((!subdomain || isWWW || isVercel) && internalFolders.includes(basePath)) {
       return NextResponse.next();
