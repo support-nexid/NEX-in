@@ -38,7 +38,12 @@ export default function OnboardingPage() {
       });
       
       if (!aiRes.ok) {
-        throw new Error("Failed to generate portfolio from AI");
+        let errStr = "Failed to generate portfolio from AI";
+        try {
+          const errData = await aiRes.json();
+          errStr = errData?.error || errStr;
+        } catch(e) {}
+        throw new Error(errStr);
       }
       
       const { data: generatedData } = await aiRes.json();
@@ -77,9 +82,9 @@ export default function OnboardingPage() {
         window.location.href = '/app';
       }, 500);
 
-    } catch (e) {
-       console.error(e);
-       alert("Failed to build portfolio. Try again.");
+    } catch (e: any) {
+       console.error("AI Generation Error:", e);
+       alert("Failed to build portfolio.\nReason: " + (e.message || "Unknown error"));
        setSaving(false);
     }
   };
