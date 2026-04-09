@@ -108,7 +108,7 @@ export default function OnboardingPage() {
               )}
               {/* Overlay ImageUpload to let them pick */}
               <ImageUpload
-                 preset="nexid_avatars"
+                 folder="avatars"
                  className="absolute inset-0 z-10"
                  onSuccess={(url) => setAvatar(url)}
               />

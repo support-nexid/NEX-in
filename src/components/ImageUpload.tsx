@@ -10,7 +10,7 @@ interface Props {
   preset?: string;
 }
 
-export default function ImageUpload({ onSuccess, className = "", folder = "", buttonLabel = "Upload", preset = "nexid_avatars" }: Props) {
+export default function ImageUpload({ onSuccess, className = "", folder = "avatars", buttonLabel = "Upload", preset = "" }: Props) {
   const [uploading, setUploading] = useState(false);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
