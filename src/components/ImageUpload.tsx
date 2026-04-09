@@ -63,7 +63,7 @@ export default function ImageUpload({ onSuccess, className = "", folder = "", bu
           accept="image/*" 
           onChange={handleFileChange} 
           disabled={uploading}
-          className="hidden" 
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-50" 
         />
         {uploading ? (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-inherit">
