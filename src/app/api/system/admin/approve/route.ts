@@ -3,6 +3,8 @@ import { adminDb } from '@/lib/firebase-admin';
 import { withAuth } from '@/lib/auth-wrapper';
 import crypto from 'crypto';
 
+export const dynamic = 'force-dynamic';
+
 export const POST = withAuth(['admin', 'superadmin'], async (req, decodedToken) => {
   try {
     const { utrNumber, action } = await req.json(); // action => 'approve' | 'reject'

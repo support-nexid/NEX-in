@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth-wrapper';
 import { adminDb } from '@/lib/firebase-admin';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/system/user/messages — Get user's inbox messages
 export const GET = withAuth(['user', 'admin', 'superadmin'], async (req, decodedToken) => {
   try {
@@ -13,7 +15,7 @@ export const GET = withAuth(['user', 'admin', 'superadmin'], async (req, decoded
       .limit(50)
       .get();
 
-    const messages = messagesSnap.docs.map(doc => ({
+    const messages = messagesSnap.docs.map((doc: FirebaseFirestore.QueryDocumentSnapshot) => ({
       id: doc.id,
       ...doc.data(),
     }));

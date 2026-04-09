@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth-wrapper';
 import { adminDb } from '@/lib/firebase-admin';
 
+export const dynamic = 'force-dynamic';
+
 // POST /api/system/support/tickets — Create support ticket
 export const POST = withAuth(['user', 'support', 'admin', 'superadmin'], async (req, decodedToken) => {
   try {
@@ -48,7 +50,7 @@ export const GET = withAuth(['user', 'support', 'admin', 'superadmin'], async (r
     }
 
     const snap = await query.get();
-    const tickets = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const tickets = snap.docs.map((doc: FirebaseFirestore.QueryDocumentSnapshot) => ({ id: doc.id, ...doc.data() }));
 
     return NextResponse.json({ tickets });
   } catch (error) {

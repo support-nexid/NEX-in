@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth-wrapper';
 import { adminDb } from '@/lib/firebase-admin';
 
+export const dynamic = 'force-dynamic';
+
 // POST /api/system/user/theme — Apply a theme
 export const POST = withAuth(['user', 'admin', 'superadmin'], async (req, decodedToken) => {
   try {

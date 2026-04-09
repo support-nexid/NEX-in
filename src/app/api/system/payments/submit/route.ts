@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase-admin';
 import { withAuth } from '@/lib/auth-wrapper';
 
+export const dynamic = 'force-dynamic';
+
 export const POST = withAuth(['user', 'admin', 'superadmin'], async (req, decodedToken) => {
   try {
     const { utrNumber, screenshotUrl, planTier } = await req.json();

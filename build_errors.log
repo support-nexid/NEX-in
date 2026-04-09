@@ -11,51 +11,10 @@
    Skipping linting
    Collecting page data ...
  ⚠ Using edge runtime on a page currently disables static generation for that page
-   Generating static pages (0/23) ...
-[API Auth Error] B [Error]: Dynamic server usage: Route /api/system/health couldn't be rendered statically because it used `request.headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
-    at V (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:21778)
-    at Object.get (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:29465)
-    at D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\app\api\system\admin\approve\route.js:1:2703
-    at D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
-    at D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\server\lib\trace\tracer.js:140:36
-    at NoopContextManager.with (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@opentelemetry\api\build\src\context\NoopContextManager.js:14:19)
-    at ContextAPI.with (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@opentelemetry\api\build\src\api\context.js:51:46)
-    at NoopTracer.startActiveSpan (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@opentelemetry\api\build\src\trace\NoopTracer.js:54:31)
-    at ProxyTracer.startActiveSpan (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@opentelemetry\api\build\src\trace\ProxyTracer.js:27:24)
-    at D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\server\lib\trace\tracer.js:122:103 {
-  description: "Route /api/system/health couldn't be rendered statically because it used `request.headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
-  digest: 'DYNAMIC_SERVER_USAGE'
-}
-[API Auth Error] B [Error]: Dynamic server usage: Route /api/system/user/profile couldn't be rendered statically because it used `request.headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
-    at V (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:21778)
-    at Object.get (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:29465)
-    at D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\app\api\system\cron\route.js:5:47235
-    at D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
-    at D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\server\lib\trace\tracer.js:140:36
-    at NoopContextManager.with (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@opentelemetry\api\build\src\context\NoopContextManager.js:14:19)
-    at ContextAPI.with (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@opentelemetry\api\build\src\api\context.js:51:46)
-    at NoopTracer.startActiveSpan (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@opentelemetry\api\build\src\trace\NoopTracer.js:54:31)
-    at ProxyTracer.startActiveSpan (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@opentelemetry\api\build\src\trace\ProxyTracer.js:27:24)
-    at D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\server\lib\trace\tracer.js:122:103 {
-  description: "Route /api/system/user/profile couldn't be rendered statically because it used `request.headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
-  digest: 'DYNAMIC_SERVER_USAGE'
-}
-   Generating static pages (5/23) 
-   Generating static pages (11/23) 
-[API Auth Error] B [Error]: Dynamic server usage: Route /api/system/user/messages couldn't be rendered statically because it used `request.headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
-    at V (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:21778)
-    at Object.get (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:29465)
-    at D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\app\api\system\cron\route.js:5:47235
-    at D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38417
-    at D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\server\lib\trace\tracer.js:140:36
-    at NoopContextManager.with (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@opentelemetry\api\build\src\context\NoopContextManager.js:14:19)
-    at ContextAPI.with (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@opentelemetry\api\build\src\api\context.js:51:46)
-    at NoopTracer.startActiveSpan (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@opentelemetry\api\build\src\trace\NoopTracer.js:54:31)
-    at ProxyTracer.startActiveSpan (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@opentelemetry\api\build\src\trace\ProxyTracer.js:27:24)
-    at D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\server\lib\trace\tracer.js:122:103 {
-  description: "Route /api/system/user/messages couldn't be rendered statically because it used `request.headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
-  digest: 'DYNAMIC_SERVER_USAGE'
-}
+   Generating static pages (0/15) ...
+   Generating static pages (3/15) 
+   Generating static pages (7/15) 
+   Generating static pages (11/15) 
 Critical: Failed to initialize DB1 x [FirebaseError]: Firebase: Error (auth/invalid-api-key).
     at y (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\chunks\781.js:3:333245)
     at v (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\chunks\781.js:3:333293)
@@ -70,7 +29,6 @@ Critical: Failed to initialize DB1 x [FirebaseError]: Firebase: Error (auth/inva
   code: 'auth/invalid-api-key',
   customData: { appName: '[DEFAULT]' }
 }
-   Generating static pages (17/23) 
 Error fetching landing config: Error: Could not load the default credentials. Browse to https://cloud.google.com/docs/authentication/getting-started for more information.
     at GoogleAuth.getApplicationDefaultAsync (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\google-gax\node_modules\google-auth-library\build\src\auth\googleauth.js:287:15)
     at async GoogleAuth._GoogleAuth_determineClient (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\google-gax\node_modules\google-auth-library\build\src\auth\googleauth.js:834:32)
@@ -105,14 +63,14 @@ Caused by: Error
     at Firestore.getAll (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@google-cloud\firestore\build\src\index.js:1031:32)
     at D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@google-cloud\firestore\build\src\reference\document-reference.js:182:36
     at D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@google-cloud\firestore\build\src\telemetry\enabled-trace-util.js:110:30
- ✓ Generating static pages (23/23)
+ ✓ Generating static pages (15/15)
    Finalizing page optimization ...
    Collecting build traces ...
 
 Route (app)                              Size     First Load JS
 ┌ ○ /_not-found                          873 B          88.4 kB
 ├ ƒ /admin                               10.8 kB         213 kB
-├ ○ /api/cloudinary-sign                 0 B                0 B
+├ ƒ /api/cloudinary-sign                 0 B                0 B
 ├ ƒ /api/system/admin/approve            0 B                0 B
 ├ ƒ /api/system/cron                     0 B                0 B
 ├ ƒ /api/system/health                   0 B                0 B
@@ -142,7 +100,7 @@ Route (app)                              Size     First Load JS
   └ other shared chunks (total)          2.14 kB
 
 
-ƒ Middleware                             25.7 kB
+ƒ Middleware                             25.6 kB
 
 ○  (Static)   prerendered as static content
 ƒ  (Dynamic)  server-rendered on demand

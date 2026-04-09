@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth-wrapper';
 import { adminDb } from '@/lib/firebase-admin';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/system/user/profile — Get user profile
 export const GET = withAuth(['user', 'admin', 'superadmin'], async (req, decodedToken) => {
   try {
