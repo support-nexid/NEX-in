@@ -73,21 +73,40 @@ function ChecklistItem({ done, label, cta, onClick }: { done: boolean; label: st
 function DashboardView({ setActiveTab }: { setActiveTab: (tab: string) => void }) {
   const { user } = useAuth();
   const [totalViews, setTotalViews] = useState("-");
+  const [portfolio, setPortfolio] = useState<any>(null);
 
   useEffect(() => {
     async function loadStats() {
       if (!user) return;
       try {
-        const hits = await syncGetDocs('analytics');
-        // Filter those matching our user
-        const ourHits = hits.filter((h: any) => h.userId === user.uid);
+        const [hits, port] = await Promise.all([
+          syncGetDocs('analytics'),
+          syncGetDoc('portfolios', user.uid)
+        ]);
+        const ourHits = (hits as any[]).filter((h: any) => h.userId === user.uid);
         setTotalViews(ourHits.length.toString());
+        setPortfolio(port);
       } catch (e) {
         console.error("Dashboard Analytics Sync Error", e);
       }
     }
     loadStats();
   }, [user]);
+
+  const projects = (portfolio as any)?.projects?.length ?? 0;
+  const skills = (portfolio as any)?.skills?.length ?? 0;
+  const experiences = (portfolio as any)?.experience?.length ?? 0;
+  const certs = (portfolio as any)?.certifications?.length ?? 0;
+  const hasHero = !!(portfolio as any)?.name;
+  const hasBio = !!(portfolio as any)?.bio;
+  const hasSkill = skills > 0;
+  const hasProject = projects > 0;
+  const hasAnimation = !!(portfolio as any)?.animation;
+  const isPublished = !!(portfolio as any)?.is_published;
+
+  const checklistItems = [hasHero, hasBio, hasSkill, hasProject, hasAnimation, isPublished];
+  const completedCount = checklistItems.filter(Boolean).length;
+  const completePct = Math.round((completedCount / checklistItems.length) * 100);
 
   return (
     <div className="space-y-8">
@@ -103,9 +122,9 @@ function DashboardView({ setActiveTab }: { setActiveTab: (tab: string) => void }
           <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white/5 text-gray-400 border border-white/10">Free Plan</span>
         </div>
         <div className="flex gap-8 flex-wrap">
-          <UsageBar label="Projects" current={0} max={3} />
-          <UsageBar label="Skills" current={0} max={10} />
-          <UsageBar label="Experiences" current={0} max={3} />
+          <UsageBar label="Projects" current={projects} max={3} />
+          <UsageBar label="Skills" current={skills} max={10} />
+          <UsageBar label="Experiences" current={experiences} max={3} />
         </div>
       </div>
 
@@ -113,28 +132,28 @@ function DashboardView({ setActiveTab }: { setActiveTab: (tab: string) => void }
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <StatCard icon="📈" value={totalViews} label="Total Views" color="bg-indigo-500/20" />
         <StatCard icon="✉️" value={0} label="Unread Messages" color="bg-purple-500/20" />
-        <StatCard icon="📁" value={0} label="Projects" color="bg-emerald-500/20" />
-        <StatCard icon="💼" value={0} label="Experiences" color="bg-amber-500/20" />
-        <StatCard icon="⚡" value={0} label="Skills" color="bg-rose-500/20" />
-        <StatCard icon="🏆" value={0} label="Certifications" color="bg-cyan-500/20" />
+        <StatCard icon="📁" value={projects} label="Projects" color="bg-emerald-500/20" />
+        <StatCard icon="💼" value={experiences} label="Experiences" color="bg-amber-500/20" />
+        <StatCard icon="⚡" value={skills} label="Skills" color="bg-rose-500/20" />
+        <StatCard icon="🏆" value={certs} label="Certifications" color="bg-cyan-500/20" />
       </div>
 
       {/* Get Started Checklist */}
       <div className="glass-card rounded-2xl p-8 hover:transform-none">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold">Get Started</h2>
-          <span className="text-sm text-gray-500 font-medium">0% complete</span>
+          <span className="text-sm text-gray-500 font-medium">{completePct}% complete</span>
         </div>
         <div className="w-full h-1.5 bg-white/5 rounded-full mb-6 overflow-hidden">
-          <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full" style={{ width: '0%' }}></div>
+          <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-700" style={{ width: `${completePct}%` }}></div>
         </div>
         <div className="space-y-2">
-          <ChecklistItem done={false} label="Complete your Hero section" cta="Edit Hero" onClick={() => setActiveTab('portfolio')} />
-          <ChecklistItem done={false} label="Add About information" cta="Add Bio" onClick={() => setActiveTab('portfolio')} />
-          <ChecklistItem done={false} label="Add at least one Skill" cta="Add Skill" onClick={() => setActiveTab('skills')} />
-          <ChecklistItem done={false} label="Add at least one Project" cta="Add Project" onClick={() => setActiveTab('projects')} />
-          <ChecklistItem done={false} label="Choose an Animation Style" cta="Pick Animation" onClick={() => setActiveTab('animations')} />
-          <ChecklistItem done={false} label="Publish your portfolio" cta="Publish Now" />
+          <ChecklistItem done={hasHero} label="Complete your Hero section" cta="Edit Hero" onClick={() => setActiveTab('portfolio')} />
+          <ChecklistItem done={hasBio} label="Add About information" cta="Add Bio" onClick={() => setActiveTab('portfolio')} />
+          <ChecklistItem done={hasSkill} label="Add at least one Skill" cta="Add Skill" onClick={() => setActiveTab('skills')} />
+          <ChecklistItem done={hasProject} label="Add at least one Project" cta="Add Project" onClick={() => setActiveTab('projects')} />
+          <ChecklistItem done={hasAnimation} label="Choose an Animation Style" cta="Pick Animation" onClick={() => setActiveTab('animations')} />
+          <ChecklistItem done={isPublished} label="Publish your portfolio" cta="Publish Now" onClick={() => setActiveTab('settings')} />
         </div>
       </div>
     </div>
@@ -930,11 +949,78 @@ function CertificationsView() {
 
 /* ─────── Settings View ─────── */
 function SettingsView() {
+  const { user, profile } = useAuth();
+  const [name, setName] = useState(profile?.name || '');
+  const [username, setUsername] = useState(profile?.username || '');
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMsg, setSaveMsg] = useState('');
+  const [prefs, setPrefs] = useState({
+    showViews: true,
+    contactForm: true,
+    availableBadge: true,
+    seoIndex: false,
+  });
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [isPublished, setIsPublished] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      syncGetDoc('portfolios', user.uid).then((snap: any) => {
+        if (snap?.preferences) setPrefs({ ...prefs, ...snap.preferences });
+        if (snap?.is_published) setIsPublished(!!snap.is_published);
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  const handleSaveAccount = async () => {
+    if (!user) return;
+    setIsSaving(true);
+    await syncSetDoc('users', user.uid, { name, username });
+    setSaveMsg('Account saved!');
+    setTimeout(() => setSaveMsg(''), 3000);
+    setIsSaving(false);
+  };
+
+  const handleTogglePref = async (key: keyof typeof prefs) => {
+    if (!user) return;
+    const updated = { ...prefs, [key]: !prefs[key] };
+    setPrefs(updated);
+    await syncSetDoc('portfolios', user.uid, { preferences: updated });
+  };
+
+  const handlePublish = async () => {
+    if (!user) return;
+    setIsPublishing(true);
+    await syncSetDoc('portfolios', user.uid, { is_published: !isPublished, updatedAt: Date.now() });
+    setIsPublished(!isPublished);
+    setIsPublishing(false);
+  };
+
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-black text-white mb-1">Settings</h1>
         <p className="text-gray-500">Manage your account, portfolio preferences, and privacy.</p>
+      </div>
+
+      {/* Publish Toggle */}
+      <div className={`rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border ${
+        isPublished ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-white/[0.02] border-white/5'
+      }`}>
+        <div>
+          <h2 className="text-lg font-bold">{isPublished ? '🟢 Portfolio is Live' : '⚪ Portfolio is Private'}</h2>
+          <p className="text-gray-500 text-sm">{isPublished ? 'Your portfolio is publicly accessible at your URL.' : 'Your portfolio is hidden. Publish it to the world!'}</p>
+        </div>
+        <button
+          onClick={handlePublish}
+          disabled={isPublishing}
+          className={`flex-shrink-0 px-6 py-3 rounded-xl font-bold text-sm disabled:opacity-50 transition-all ${
+            isPublished ? 'bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/10' : 'btn-primary !rounded-xl'
+          }`}
+        >
+          {isPublishing ? 'Saving...' : isPublished ? 'Unpublish' : '🚀 Publish Portfolio'}
+        </button>
       </div>
 
       {/* Account */}
@@ -944,20 +1030,24 @@ function SettingsView() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-sm text-gray-400 font-semibold block mb-2">Full Name</label>
-              <input className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-indigo-500/50 focus:outline-none transition-colors" defaultValue="Veer Bhanushali" />
+              <input value={name} onChange={e => setName(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-indigo-500/50 focus:outline-none transition-colors" placeholder="Your Name" />
             </div>
             <div>
               <label className="text-sm text-gray-400 font-semibold block mb-2">Email</label>
-              <input className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-indigo-500/50 focus:outline-none transition-colors" defaultValue="veer@nexid.in" />
+              <input value={user?.email || ''} disabled className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-gray-500 cursor-not-allowed" />
             </div>
           </div>
           <div>
             <label className="text-sm text-gray-400 font-semibold block mb-2">Username / Subdomain</label>
             <div className="flex items-center gap-2">
-              <input className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white font-mono focus:border-indigo-500/50 focus:outline-none transition-colors" defaultValue="veer" />
+              <input value={username} onChange={e => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))} className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white font-mono focus:border-indigo-500/50 focus:outline-none transition-colors" placeholder="yourname" />
               <span className="text-gray-500 font-mono text-sm">.nexid.in</span>
             </div>
           </div>
+          {saveMsg && <p className="text-emerald-400 text-sm font-bold">{saveMsg}</p>}
+          <button onClick={handleSaveAccount} disabled={isSaving} className="btn-primary !rounded-xl !py-3 !px-8 text-sm disabled:opacity-50">
+            {isSaving ? 'Saving...' : 'Save Account'}
+          </button>
         </div>
       </div>
 
@@ -965,19 +1055,19 @@ function SettingsView() {
       <div className="glass-card rounded-2xl p-6 sm:p-8 hover:transform-none">
         <h2 className="text-lg font-bold mb-6">Portfolio Preferences</h2>
         <div className="space-y-4">
-          {[
-            { label: 'Show profile views counter', desc: 'Display total view count on your portfolio', enabled: true },
-            { label: 'Enable contact form', desc: 'Allow visitors to send you messages', enabled: true },
-            { label: 'Show "Available for Work" badge', desc: 'Display availability status in hero section', enabled: true },
-            { label: 'Allow search engine indexing', desc: 'Let Google and other search engines find your portfolio', enabled: false },
-          ].map((setting) => (
+          {([
+            { key: 'showViews', label: 'Show profile views counter', desc: 'Display total view count on your portfolio' },
+            { key: 'contactForm', label: 'Enable contact form', desc: 'Allow visitors to send you messages' },
+            { key: 'availableBadge', label: 'Show "Available for Work" badge', desc: 'Display availability status in hero section' },
+            { key: 'seoIndex', label: 'Allow search engine indexing', desc: 'Let Google and other search engines find your portfolio' },
+          ] as { key: keyof typeof prefs; label: string; desc: string }[]).map((setting) => (
             <div key={setting.label} className="flex items-center justify-between py-3 border-b border-white/5 last:border-0">
               <div>
                 <p className="text-sm text-white font-medium">{setting.label}</p>
                 <p className="text-xs text-gray-500">{setting.desc}</p>
               </div>
-              <button className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 ${setting.enabled ? 'bg-indigo-500' : 'bg-white/10'}`}>
-                <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${setting.enabled ? 'left-[26px]' : 'left-0.5'}`}></div>
+              <button onClick={() => handleTogglePref(setting.key)} className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 ${prefs[setting.key] ? 'bg-indigo-500' : 'bg-white/10'}`}>
+                <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${prefs[setting.key] ? 'left-[26px]' : 'left-0.5'}`}></div>
               </button>
             </div>
           ))}
@@ -1427,7 +1517,23 @@ export default function BuilderApp() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const { user, profile } = useAuth();
+
+  // Only show onboarding wizard for users who haven't dismissed it
+  useEffect(() => {
+    if (user) {
+      syncGetDoc('users', user.uid).then((snap: any) => {
+        // Show wizard only if they never completed it
+        if (!snap?.wizardComplete) setShowOnboarding(true);
+      });
+    }
+  }, [user]);
+
+  const handleWizardComplete = async () => {
+    if (user) await syncSetDoc('users', user.uid, { wizardComplete: true });
+    setShowOnboarding(false);
+  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -1452,10 +1558,13 @@ export default function BuilderApp() {
     setMobileMenuOpen(false);
   };
 
+  const userSubdomain = (profile as any)?.username || user?.uid;
+  const portfolioUrl = `https://${userSubdomain}.nexid.in`;
+
   return (
     <>
     {/* Onboarding Wizard */}
-    {showOnboarding && <OnboardingWizard onComplete={() => setShowOnboarding(false)} />}
+    {showOnboarding && <OnboardingWizard onComplete={handleWizardComplete} />}
 
     <div className="min-h-screen bg-[#050505] text-white flex">
       {/* Mobile Overlay */}
@@ -1499,7 +1608,7 @@ export default function BuilderApp() {
 
         {/* Bottom: View Portfolio Link */}
         <div className="p-4 border-t border-white/5">
-          <a href="#" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-indigo-400 hover:bg-indigo-500/10 transition-colors">
+          <a href={portfolioUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-indigo-400 hover:bg-indigo-500/10 transition-colors">
             <span>🔗</span>
             <span className={`${!sidebarOpen ? 'lg:hidden' : ''}`}>View Portfolio</span>
           </a>
@@ -1515,8 +1624,11 @@ export default function BuilderApp() {
             <span className="text-sm text-gray-600 font-medium hidden sm:inline">app.nexid.in</span>
           </div>
           <div className="flex items-center gap-3 sm:gap-4">
-            <button className="btn-primary !py-2 !px-4 sm:!px-5 text-xs sm:text-sm !rounded-xl">Publish</button>
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-sm cursor-pointer">V</div>
+            <a href={portfolioUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-gray-500 hover:text-indigo-400 transition-colors hidden sm:inline font-mono">{userSubdomain}.nexid.in ↗</a>
+            <button onClick={() => setActiveTab('settings')} className="btn-primary !py-2 !px-4 sm:!px-5 text-xs sm:text-sm !rounded-xl">Publish</button>
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-sm cursor-pointer" title={user?.email || ''}>
+              {(profile as any)?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U'}
+            </div>
           </div>
         </div>
 
