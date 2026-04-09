@@ -10,10 +10,10 @@ export default function OnboardingPage() {
   const { user, profile, loading } = useAuth();
   const router = useRouter();
 
-  const [avatar, setAvatar] = useState('');
-  const [tagline, setTagline] = useState('');
-  const [phone, setPhone] = useState('');
+  const [avatar, setAvatar] = useState(user?.photoURL || '');
+  const [prompt, setPrompt] = useState('');
   const [saving, setSaving] = useState(false);
+  const [loadingMsg, setLoadingMsg] = useState('Finalizing Setup...');
 
   useEffect(() => {
     if (profile?.onboardingComplete) {
@@ -27,20 +27,59 @@ export default function OnboardingPage() {
 
   const handleFinish = async () => {
     setSaving(true);
+    setLoadingMsg("AI is thinking...");
+    
     try {
+      // 1. Generate full portfolio with AI
+      const aiRes = await fetch('/api/system/ai/generate-portfolio', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      });
+      
+      if (!aiRes.ok) {
+        throw new Error("Failed to generate portfolio from AI");
+      }
+      
+      const { data: generatedData } = await aiRes.json();
+      
+      setLoadingMsg("Saving to database...");
+
+      // 2. Save Portfolio to DB
+      const portfolioPayload = {
+        name: user.displayName || "Unknown User",
+        tagline: generatedData.tagline || "",
+        bio: generatedData.bio || "",
+        location: "Planet Earth",
+        avatar: avatar,
+        theme: "dark",
+        tier: "free",
+        stats: { views: 0, projects: generatedData.projects?.length || 0, experience: generatedData.experience?.length || 0 },
+        skills: generatedData.skills || [],
+        projects: generatedData.projects || [],
+        experience: generatedData.experience || [],
+        certifications: [],
+        socials: { github: "#", linkedin: "#" },
+        is_active: false, // Must explicitly publish to show
+        is_published: false
+      };
+      
+      await syncSetDoc('portfolios', user.uid, portfolioPayload);
+
+      // 3. Mark User as Onboarded
       await syncSetDoc('users', user.uid, {
         avatar,
-        tagline,
-        phone,
         onboardingComplete: true
       });
+
       // Need a slight delay for context to re-hydrate, then route to app
       setTimeout(() => {
         window.location.href = '/app';
       }, 500);
+
     } catch (e) {
        console.error(e);
-       alert("Failed to save details. Try again.");
+       alert("Failed to build portfolio. Try again.");
        setSaving(false);
     }
   };
@@ -53,15 +92,14 @@ export default function OnboardingPage() {
         <div className="absolute bottom-1/3 right-1/4 w-[500px] h-[500px] bg-purple-500/8 rounded-full blur-[150px]"></div>
       </div>
 
-      <div className="relative w-full max-w-lg">
+      <div className="relative w-full max-w-xl">
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-black text-white mb-2">Almost there!</h1>
-          <p className="text-gray-500">Let's complete your profile to finish setting up your portfolio.</p>
+          <h1 className="text-4xl font-black text-white mb-3">Let's build your portfolio.</h1>
+          <p className="text-gray-400">Describe who you are, and NEX-Ai will instantly generate your entire layout, skills, and dummy projects.</p>
         </div>
 
-        <div className="rounded-3xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-8 space-y-6">
+        <div className="rounded-3xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-8 space-y-6 shadow-2xl">
           <div className="flex flex-col items-center">
-            <span className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Profile Photo</span>
             <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-dashed border-white/20 hover:border-indigo-500/50 transition-colors relative mb-2">
               {avatar ? (
                 <img src={avatar} alt="Profile" className="w-full h-full object-cover" />
@@ -71,42 +109,41 @@ export default function OnboardingPage() {
               {/* Overlay ImageUpload to let them pick */}
               <ImageUpload
                  preset="nexid_avatars"
-                 className="absolute inset-0"
+                 className="absolute inset-0 z-10"
                  onSuccess={(url) => setAvatar(url)}
               />
             </div>
-            <p className="text-[10px] text-gray-500">Tap to upload</p>
+            <p className="text-xs text-gray-500 font-medium">Profile Photo (Optional)</p>
           </div>
 
           <div className="space-y-4 pt-4 border-t border-white/10">
             <div>
-              <label className="text-sm text-gray-400 font-semibold block mb-2">Tagline or Profession</label>
-              <input 
-                type="text" 
-                value={tagline}
-                onChange={e => setTagline(e.target.value)}
-                placeholder="e.g. Senior Software Engineer" 
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-gray-600 focus:border-indigo-500/50 focus:outline-none transition-colors text-sm" 
-              />
-            </div>
-            <div>
-              <label className="text-sm text-gray-400 font-semibold block mb-2">Phone Number</label>
-              <input 
-                type="text" 
-                value={phone}
-                onChange={e => setPhone(e.target.value)}
-                placeholder="+91 9876543210" 
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-gray-600 focus:border-indigo-500/50 focus:outline-none transition-colors text-sm" 
+              <label className="text-sm font-bold text-gray-300 block mb-3">Describe Yourself</label>
+              <textarea 
+                value={prompt}
+                onChange={e => setPrompt(e.target.value)}
+                placeholder="I am a Graphic Designer who loves 3D rendering and dark mode aesthetics..." 
+                className="w-full h-32 bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-gray-600 focus:border-indigo-500/50 focus:bg-white/10 focus:-translate-y-1 focus:outline-none transition-all text-sm resize-none" 
               />
             </div>
           </div>
 
           <button 
             onClick={handleFinish}
-            disabled={saving || !tagline || !phone} 
-            className="w-full mt-4 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold rounded-2xl transition-all hover:shadow-xl hover:shadow-indigo-500/20 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            disabled={saving || prompt.trim().length < 10} 
+            className="group w-full mt-4 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold rounded-2xl transition-all hover:shadow-xl hover:shadow-indigo-500/30 disabled:opacity-50 disabled:cursor-not-allowed text-sm flex items-center justify-center gap-3"
           >
-            {saving ? 'Finalizing Setup...' : 'Complete Registration'}
+            {saving ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                {loadingMsg}
+              </>
+            ) : (
+              <>
+                Generate My Portfolio 🚀
+                <span className="group-hover:translate-x-1 transition-transform">→</span>
+              </>
+            )}
           </button>
         </div>
       </div>
