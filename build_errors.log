@@ -14,7 +14,6 @@
    Generating static pages (0/15) ...
    Generating static pages (3/15) 
    Generating static pages (7/15) 
-   Generating static pages (11/15) 
 Critical: Failed to initialize DB1 x [FirebaseError]: Firebase: Error (auth/invalid-api-key).
     at y (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\chunks\781.js:3:333245)
     at v (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\chunks\781.js:3:333293)
@@ -29,6 +28,7 @@ Critical: Failed to initialize DB1 x [FirebaseError]: Firebase: Error (auth/inva
   code: 'auth/invalid-api-key',
   customData: { appName: '[DEFAULT]' }
 }
+   Generating static pages (11/15) 
 Error fetching landing config: Error: Could not load the default credentials. Browse to https://cloud.google.com/docs/authentication/getting-started for more information.
     at GoogleAuth.getApplicationDefaultAsync (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\google-gax\node_modules\google-auth-library\build\src\auth\googleauth.js:287:15)
     at async GoogleAuth._GoogleAuth_determineClient (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\google-gax\node_modules\google-auth-library\build\src\auth\googleauth.js:834:32)
