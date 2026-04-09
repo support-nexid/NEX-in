@@ -13,12 +13,9 @@ export const metadata: Metadata = {
 
 import RequiresVerification from '@/components/RequiresVerification';
 import RequiresOnboarding from '@/components/RequiresOnboarding';
-import MobileBlocker from '@/components/MobileBlocker';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <>
-    <MobileBlocker />
     <AuthProvider>
       <RequiresVerification>
         <RequiresOnboarding>
@@ -26,6 +23,5 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </RequiresOnboarding>
       </RequiresVerification>
     </AuthProvider>
-    </>
   );
 }

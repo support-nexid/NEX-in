@@ -116,7 +116,7 @@ export default function OnboardingPage() {
               {/* Overlay ImageUpload to let them pick */}
               <ImageUpload
                  folder="avatars"
-                 className="absolute inset-0 z-10"
+                 className="absolute inset-0 z-10 w-full h-full"
                  onSuccess={(url) => setAvatar(url)}
               />
             </div>
