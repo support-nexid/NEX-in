@@ -56,7 +56,23 @@ export async function POST(request: Request) {
     - Make the content highly professional.
     `;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
+    // Dynamically retrieve the latest permitted model for this specific API key
+    const modelsRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+    if (!modelsRes.ok) {
+        throw new Error("Failed to retrieve permitted Gemini models for this API key. Ensure API key is valid and has permissions.");
+    }
+    const modelsData = await modelsRes.json();
+    
+    // Find any model that supports generateContent (prioritize flash if available for speed, otherwise just pick first)
+    const validModels = modelsData.models.filter((m: any) => m.supportedGenerationMethods?.includes("generateContent"));
+    if (!validModels || validModels.length === 0) {
+        throw new Error("No text generation models are enabled for this API key in Google Cloud Console.");
+    }
+    
+    // Attempt to grab 1.5-flash if available, otherwise fallback to the first permitted generation model
+    const selectedModel = validModels.find((m: any) => m.name.includes('1.5-flash')) || validModels[0];
+
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/${selectedModel.name}:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
