@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { GithubIcon, GoogleIcon, InstagramIcon, FacebookIcon, XIcon } from '@/components/icons';
-import { syncSetDoc, syncGetDocs, syncSubscribe } from '@/lib/db-sync';
+import { syncSetDoc, syncGetDoc, syncGetDocs, syncSubscribe } from '@/lib/db-sync';
 import { where, orderBy } from 'firebase/firestore';
 import { useAuth } from '@/lib/auth-context';
 import ImageUpload from '@/components/ImageUpload';
@@ -271,6 +271,32 @@ function PortfolioView() {
 
 /* ─────── Projects View ─────── */
 function ProjectsView() {
+  const { user } = useAuth();
+  const [projects, setProjects] = useState<any[]>([]);
+  
+  useEffect(() => {
+    if (user) {
+      syncGetDoc('portfolios', user.uid).then(snap => {
+        if ((snap as any)?.projects) setProjects((snap as any).projects);
+      });
+    }
+  }, [user]);
+
+  const handleAdd = async () => {
+    if (!user) return;
+    const newProj = { id: Date.now().toString(), title: 'New Project ' + (projects.length + 1), description: 'Describe your project here' };
+    const updated = [...projects, newProj];
+    setProjects(updated);
+    await syncSetDoc('portfolios', user.uid, { projects: updated });
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!user) return;
+    const updated = projects.filter(p => p.id !== id);
+    setProjects(updated);
+    await syncSetDoc('portfolios', user.uid, { projects: updated });
+  };
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
@@ -278,29 +304,68 @@ function ProjectsView() {
           <h1 className="text-3xl font-black text-white mb-1">Projects</h1>
           <p className="text-gray-500">Showcase your best work. Drag to reorder.</p>
         </div>
-        <button className="btn-primary !rounded-xl flex items-center gap-2 text-sm">
+        <button onClick={handleAdd} className="btn-primary !rounded-xl flex items-center gap-2 text-sm">
           + Add Project
         </button>
       </div>
 
       <div className="flex items-center gap-3 text-sm text-gray-500 font-medium">
-        Projects <span className="px-2 py-0.5 bg-white/5 rounded font-bold text-white">0 / 3</span>
+        Projects <span className="px-2 py-0.5 bg-white/5 rounded font-bold text-white">{projects.length} / 3</span>
       </div>
 
-      {/* Empty State */}
-      <div className="glass-card rounded-2xl p-16 hover:transform-none text-center">
-        <div className="w-20 h-20 mx-auto rounded-2xl bg-indigo-500/10 flex items-center justify-center text-4xl mb-6">📁</div>
-        <h2 className="text-2xl font-bold mb-3">No projects yet</h2>
-        <p className="text-gray-500 max-w-md mx-auto mb-8">Showcase your best work by adding projects. Include case studies, demos, and key achievements.</p>
-        <button className="btn-primary !rounded-xl">Add Your First Project</button>
-      </div>
+      {projects.length === 0 ? (
+        <div className="glass-card rounded-2xl p-16 hover:transform-none text-center">
+          <div className="w-20 h-20 mx-auto rounded-2xl bg-indigo-500/10 flex items-center justify-center text-4xl mb-6">📁</div>
+          <h2 className="text-2xl font-bold mb-3">No projects yet</h2>
+          <p className="text-gray-500 max-w-md mx-auto mb-8">Showcase your best work by adding projects. Include case studies, demos, and key achievements.</p>
+          <button onClick={handleAdd} className="btn-primary !rounded-xl">Add Your First Project</button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {projects.map(p => (
+            <div key={p.id} className="glass-card rounded-2xl p-6 relative group">
+              <h3 className="font-bold text-lg mb-2">{p.title}</h3>
+              <p className="text-sm text-gray-500">{p.description}</p>
+              <button onClick={() => handleDelete(p.id)} className="absolute top-4 right-4 text-xs text-rose-500 bg-rose-500/10 px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">Delete</button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
 /* ─────── Skills View ─────── */
 function SkillsView() {
+  const { user } = useAuth();
+  const [skills, setSkills] = useState<string[]>([]);
+  const [customSkill, setCustomSkill] = useState('');
+  
+  useEffect(() => {
+    if (user) {
+      syncGetDoc('portfolios', user.uid).then(snap => {
+        if ((snap as any)?.skills) setSkills((snap as any).skills);
+      });
+    }
+  }, [user]);
+
+  const addSkill = async (skill: string) => {
+    if (!user || !skill || skills.includes(skill)) return;
+    const updated = [...skills, skill];
+    setSkills(updated);
+    setCustomSkill('');
+    await syncSetDoc('portfolios', user.uid, { skills: updated });
+  };
+
+  const removeSkill = async (skill: string) => {
+    if (!user) return;
+    const updated = skills.filter(s => s !== skill);
+    setSkills(updated);
+    await syncSetDoc('portfolios', user.uid, { skills: updated });
+  };
+
   const presetSkills = ['JavaScript', 'TypeScript', 'React', 'Next.js', 'Node.js', 'Python', 'Firebase', 'Figma', 'TailwindCSS', 'Git', 'Docker', 'AWS'];
+  
   return (
     <div className="space-y-8">
       <div>
@@ -308,13 +373,22 @@ function SkillsView() {
         <p className="text-gray-500">Highlight your technical expertise. Select or add custom skills.</p>
       </div>
       <div className="flex items-center gap-3 text-sm text-gray-500 font-medium">
-        Skills <span className="px-2 py-0.5 bg-white/5 rounded font-bold text-white">0 / 10</span>
+        Skills <span className="px-2 py-0.5 bg-white/5 rounded font-bold text-white">{skills.length} / 10</span>
       </div>
+
+      <div className="flex flex-wrap gap-2 mb-8">
+         {skills.map(skill => (
+            <span key={skill} className="px-4 py-2 bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 rounded-xl flex items-center gap-2">
+              {skill} <button onClick={() => removeSkill(skill)} className="text-rose-400 hover:text-white font-bold">×</button>
+            </span>
+         ))}
+      </div>
+
       <div className="glass-card rounded-2xl p-8 hover:transform-none">
         <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Quick Add</h3>
         <div className="flex flex-wrap gap-3">
           {presetSkills.map((skill) => (
-            <button key={skill} className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-sm font-medium text-gray-300 hover:bg-indigo-500/20 hover:border-indigo-500/30 hover:text-indigo-300 transition-all">
+            <button key={skill} onClick={() => addSkill(skill)} disabled={skills.includes(skill)} className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${skills.includes(skill) ? 'bg-white/5 text-gray-600 opacity-50' : 'bg-white/5 border border-white/10 text-gray-300 hover:bg-indigo-500/20 hover:border-indigo-500/30 hover:text-indigo-300'}`}>
               + {skill}
             </button>
           ))}
@@ -322,8 +396,8 @@ function SkillsView() {
         <div className="mt-6 pt-6 border-t border-white/5">
           <label className="block text-sm font-semibold text-gray-400 mb-2">Custom Skill</label>
           <div className="flex gap-3">
-            <input className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-indigo-500/50 focus:outline-none transition-colors" placeholder="e.g., GraphQL" />
-            <button className="btn-primary !rounded-xl !py-3 !px-6 text-sm">Add</button>
+            <input value={customSkill} onChange={e => setCustomSkill(e.target.value)} className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-indigo-500/50 focus:outline-none transition-colors" placeholder="e.g., GraphQL" />
+            <button onClick={() => addSkill(customSkill)} className="btn-primary !rounded-xl !py-3 !px-6 text-sm">Add</button>
           </div>
         </div>
       </div>
@@ -333,6 +407,8 @@ function SkillsView() {
 
 /* ─────── Animations View ─────── */
 function AnimationsView() {
+  const { user } = useAuth();
+  
   const presets = [
     { id: 'fade', name: 'Fade In', desc: 'Elements gently appear with opacity transition', preview: 'opacity: 0 → 1' },
     { id: 'slide', name: 'Slide Up', desc: 'Content slides upward into view with momentum', preview: 'translateY: 40px → 0' },
@@ -342,6 +418,22 @@ function AnimationsView() {
     { id: 'cinema-timeline', name: 'Cinematic Timeline', desc: 'Advanced multi-step choreographed animations', preview: 'Custom cinematic sequence', pro: true },
   ];
   const [selected, setSelected] = useState('fade');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      syncGetDoc('portfolios', user.uid).then(snap => {
+        if ((snap as any)?.animation) setSelected((snap as any).animation);
+      });
+    }
+  }, [user]);
+
+  const handleApply = async () => {
+    if (!user) return;
+    setSaving(true);
+    await syncSetDoc('portfolios', user.uid, { animation: selected });
+    setSaving(false);
+  };
 
   return (
     <div className="space-y-8">
@@ -370,7 +462,9 @@ function AnimationsView() {
           </button>
         ))}
       </div>
-      <button className="btn-primary !rounded-xl">Apply Animation Preset</button>
+      <button onClick={handleApply} disabled={saving} className="btn-primary !rounded-xl disabled:opacity-50">
+        {saving ? 'Applying...' : 'Apply Animation Preset'}
+      </button>
     </div>
   );
 }
@@ -550,6 +644,28 @@ function DomainView() {
 
 /* ─────── Billing / Payment View ─────── */
 function BillingView() {
+  const { user } = useAuth();
+  const [utrNumber, setUtrNumber] = useState('');
+  const [planTarget, setPlanTarget] = useState('pro');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!user || !utrNumber) return;
+    setIsSubmitting(true);
+    await syncSetDoc('payments', Date.now().toString(), {
+      uid: user.uid,
+      email: user.email,
+      utr: utrNumber,
+      tier: planTarget,
+      amount: planTarget === 'pro' ? '₹299' : '₹999',
+      time: new Date().toISOString(),
+      status: 'pending'
+    });
+    alert('Payment details submitted successfully. Our team will verify and activate your plan shortly.');
+    setUtrNumber('');
+    setIsSubmitting(false);
+  };
+
   return (
     <div className="space-y-8">
       <div>
@@ -572,14 +688,14 @@ function BillingView() {
         <div className="space-y-5">
           <div>
             <label className="text-sm text-gray-400 font-semibold block mb-2">Select Plan</label>
-            <select className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-indigo-500/50 focus:outline-none">
+            <select value={planTarget} onChange={e => setPlanTarget(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-indigo-500/50 focus:outline-none">
               <option value="pro">Pro — ₹299/year</option>
               <option value="enterprise">Enterprise — ₹999/year</option>
             </select>
           </div>
           <div>
             <label className="text-sm text-gray-400 font-semibold block mb-2">UTR / Transaction Number</label>
-            <input className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-indigo-500/50 focus:outline-none transition-colors" placeholder="SBIN00012345678" />
+            <input value={utrNumber} onChange={e => setUtrNumber(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-indigo-500/50 focus:outline-none transition-colors" placeholder="SBIN00012345678" />
           </div>
           <div>
             <label className="text-sm text-gray-400 font-semibold block mb-2">Payment Screenshot</label>
@@ -589,7 +705,9 @@ function BillingView() {
               <p className="text-xs text-gray-600 mt-1">PNG, JPG up to 5MB</p>
             </div>
           </div>
-          <button className="btn-primary !rounded-xl w-full !py-4">Submit Payment for Verification</button>
+          <button onClick={handleSubmit} disabled={isSubmitting || !utrNumber} className="btn-primary !rounded-xl w-full !py-4 disabled:opacity-50">
+            {isSubmitting ? 'Submitting...' : 'Submit Payment for Verification'}
+          </button>
           <p className="text-xs text-gray-600 text-center">Our admin team will verify and activate your plan within a few hours.</p>
         </div>
       </div>
@@ -666,12 +784,33 @@ function InboxView() {
 
 /* ─────── Experience View ─────── */
 function ExperienceView() {
-  const experiences = [
-    { id: 1, title: 'Full Stack Developer', company: 'Freelance / Independent', period: '2024 — Present', type: 'work', description: 'Building premium web applications for clients worldwide.' },
-    { id: 2, title: 'Web Developer Intern', company: 'TechStartup Labs', period: '2023 — 2024', type: 'work', description: 'Developed multiple production features for SaaS platforms.' },
-    { id: 3, title: 'B.Tech Computer Science', company: 'Mumbai University', period: '2021 — 2025', type: 'education', description: 'Focus on Software Engineering and Cloud Computing.' },
-  ];
+  const { user } = useAuth();
+  const [experiences, setExperiences] = useState<any[]>([]);
   const [filter, setFilter] = useState('all');
+
+  useEffect(() => {
+    if (user) {
+      syncGetDoc('portfolios', user.uid).then(snap => {
+        if ((snap as any)?.experience) setExperiences((snap as any).experience);
+      });
+    }
+  }, [user]);
+
+  const handleAdd = async () => {
+    if (!user) return;
+    const newExp = { id: Date.now().toString(), title: 'New Role', company: 'Company Name', period: '2025 - Present', type: 'work', description: 'Describe your role here.' };
+    const updated = [...experiences, newExp];
+    setExperiences(updated);
+    await syncSetDoc('portfolios', user.uid, { experience: updated });
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!user) return;
+    const updated = experiences.filter(e => e.id !== id);
+    setExperiences(updated);
+    await syncSetDoc('portfolios', user.uid, { experience: updated });
+  };
+
   const filtered = filter === 'all' ? experiences : experiences.filter(e => e.type === filter);
 
   return (
@@ -681,7 +820,7 @@ function ExperienceView() {
           <h1 className="text-3xl font-black text-white mb-1">Experience</h1>
           <p className="text-gray-500">Add your work history and education.</p>
         </div>
-        <button className="btn-primary !rounded-xl !py-3 !px-6 text-sm font-bold flex-shrink-0">+ Add Experience</button>
+        <button onClick={handleAdd} className="btn-primary !rounded-xl !py-3 !px-6 text-sm font-bold flex-shrink-0">+ Add Experience</button>
       </div>
 
       {/* Filter Tabs */}
@@ -695,7 +834,7 @@ function ExperienceView() {
 
       {/* Timeline */}
       <div className="space-y-0">
-        {filtered.map((exp, i) => (
+        {filtered.map((exp) => (
           <div key={exp.id} className="relative pl-8 pb-8 last:pb-0 group">
             <div className="absolute left-0 top-3 bottom-0 w-px bg-white/10 group-last:hidden"></div>
             <div className={`absolute left-[-4px] top-3 w-[9px] h-[9px] rounded-full border-2 border-[#050505] ${exp.type === 'work' ? 'bg-indigo-500' : 'bg-amber-400'}`}></div>
@@ -708,11 +847,12 @@ function ExperienceView() {
               <p className="text-sm text-gray-500">{exp.description}</p>
               <div className="flex gap-2 mt-4">
                 <button className="text-xs text-gray-500 hover:text-white px-3 py-1 bg-white/5 rounded-lg transition-colors">✏️ Edit</button>
-                <button className="text-xs text-rose-500 hover:text-rose-400 px-3 py-1 bg-white/5 rounded-lg transition-colors">🗑 Delete</button>
+                <button onClick={() => handleDelete(exp.id)} className="text-xs text-rose-500 hover:text-rose-400 px-3 py-1 bg-white/5 rounded-lg transition-colors">🗑 Delete</button>
               </div>
             </div>
           </div>
         ))}
+        {filtered.length === 0 && <div className="text-gray-500 p-4">No experience added yet.</div>}
       </div>
     </div>
   );
@@ -720,11 +860,31 @@ function ExperienceView() {
 
 /* ─────── Certifications View ─────── */
 function CertificationsView() {
-  const certs = [
-    { id: 1, title: 'Google Cloud Professional', issuer: 'Google', year: '2024', icon: '☁️', verified: true },
-    { id: 2, title: 'AWS Solutions Architect', issuer: 'Amazon Web Services', year: '2024', icon: '🏗️', verified: true },
-    { id: 3, title: 'Meta Front-End Developer', issuer: 'Meta / Coursera', year: '2023', icon: '⚛️', verified: false },
-  ];
+  const { user } = useAuth();
+  const [certs, setCerts] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (user) {
+      syncGetDoc('portfolios', user.uid).then(snap => {
+        if ((snap as any)?.certifications) setCerts((snap as any).certifications);
+      });
+    }
+  }, [user]);
+
+  const handleAdd = async () => {
+    if (!user) return;
+    const newCert = { id: Date.now().toString(), title: 'New Certificate', issuer: 'Issuer Name', year: new Date().getFullYear().toString(), icon: '🏆', verified: false };
+    const updated = [...certs, newCert];
+    setCerts(updated);
+    await syncSetDoc('portfolios', user.uid, { certifications: updated });
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!user) return;
+    const updated = certs.filter(c => c.id !== id);
+    setCerts(updated);
+    await syncSetDoc('portfolios', user.uid, { certifications: updated });
+  };
 
   return (
     <div className="space-y-8">
@@ -733,7 +893,7 @@ function CertificationsView() {
           <h1 className="text-3xl font-black text-white mb-1">Certifications</h1>
           <p className="text-gray-500">Showcase your professional certifications and credentials.</p>
         </div>
-        <button className="btn-primary !rounded-xl !py-3 !px-6 text-sm font-bold flex-shrink-0">+ Add Certificate</button>
+        <button onClick={handleAdd} className="btn-primary !rounded-xl !py-3 !px-6 text-sm font-bold flex-shrink-0">+ Add Certificate</button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -751,13 +911,13 @@ function CertificationsView() {
             <p className="text-xs text-gray-500 mb-4">{cert.issuer} • {cert.year}</p>
             <div className="flex gap-2">
               <button className="text-xs text-gray-500 hover:text-white px-3 py-1 bg-white/5 rounded-lg transition-colors flex-1 text-center">✏️ Edit</button>
-              <button className="text-xs text-rose-500 hover:text-rose-400 px-3 py-1 bg-white/5 rounded-lg transition-colors">🗑</button>
+              <button onClick={() => handleDelete(cert.id)} className="text-xs text-rose-500 hover:text-rose-400 px-3 py-1 bg-white/5 rounded-lg transition-colors">🗑</button>
             </div>
           </div>
         ))}
 
         {/* Add New Card */}
-        <button className="rounded-2xl border-2 border-dashed border-white/10 p-6 flex flex-col items-center justify-center text-gray-500 hover:text-indigo-400 hover:border-indigo-500/20 transition-all min-h-[180px]">
+        <button onClick={handleAdd} className="rounded-2xl border-2 border-dashed border-white/10 p-6 flex flex-col items-center justify-center text-gray-500 hover:text-indigo-400 hover:border-indigo-500/20 transition-all min-h-[180px]">
           <span className="text-3xl mb-2">➕</span>
           <span className="text-sm font-medium">Add Certificate</span>
         </button>

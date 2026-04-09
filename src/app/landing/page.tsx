@@ -1,76 +1,6 @@
-"use client";
-
-import React, { useState, useEffect, useRef } from 'react';
-
-/* ─────────────── Subdomain Search Component ─────────────── */
-function SubdomainSearch() {
-  const [query, setQuery] = useState('');
-  const [status, setStatus] = useState<{available?: boolean; message?: string; loading?: boolean}>({});
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-
-  const checkAvailability = async (subdomain: string) => {
-    if (!subdomain || subdomain.length < 3) {
-      setStatus(subdomain.length > 0 && subdomain.length < 3 ? { available: false, message: 'Minimum 3 characters required' } : {});
-      return;
-    }
-    setStatus({ loading: true });
-    try {
-      const res = await fetch('/api/system/public/check-subdomain', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subdomain }),
-      });
-      const data = await res.json();
-      setStatus({ available: data.available, message: data.message, loading: false });
-    } catch {
-      setStatus({ available: false, message: 'Connection error. Try again.', loading: false });
-    }
-  };
-
-  useEffect(() => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => checkAvailability(query), 500);
-    return () => clearTimeout(timerRef.current!);
-  }, [query]);
-
-  return (
-    <div className="w-full max-w-2xl mx-auto animate-fade-in-up-delay-2">
-      <div className="relative group">
-        <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-rose-500 rounded-2xl opacity-20 group-hover:opacity-40 blur-lg transition-all duration-500"></div>
-        <div className="relative flex items-center bg-[#111] border border-white/10 rounded-2xl p-2 focus-within:border-indigo-500/50 transition-all shadow-2xl">
-          <span className="pl-6 text-gray-500 font-semibold select-none whitespace-nowrap text-lg">nexid.in /</span>
-          <input
-            type="text"
-            className="bg-transparent border-none outline-none text-white pl-2 pr-4 py-4 w-full font-bold text-xl tracking-tight"
-            placeholder="yourname"
-            value={query}
-            onChange={(e) => setQuery(e.target.value.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase())}
-            maxLength={30}
-          />
-          <button
-            disabled={!status.available}
-            className={`px-8 py-4 rounded-xl font-bold text-sm uppercase tracking-widest whitespace-nowrap transition-all duration-300 ${
-              status.available 
-                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-[0_0_30px_rgba(99,102,241,0.4)] hover:-translate-y-0.5'
-                : 'bg-white/5 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            Claim It
-          </button>
-        </div>
-      </div>
-      <div className={`text-center mt-5 h-6 text-sm font-semibold tracking-wide transition-all duration-300 ${status.message ? 'opacity-100' : 'opacity-0'}`}>
-        {status.loading ? (
-          <span className="text-gray-400 animate-pulse">Scanning registry...</span>
-        ) : status.available === true ? (
-          <span className="text-emerald-400 drop-shadow-[0_0_12px_rgba(16,185,129,0.4)]">✓ {status.message}</span>
-        ) : status.available === false ? (
-          <span className="text-rose-400 drop-shadow-[0_0_12px_rgba(244,63,94,0.4)]">✗ {status.message}</span>
-        ) : null}
-      </div>
-    </div>
-  );
-}
+import React from 'react';
+import { getLandingConfig } from '@/lib/cms';
+import { SubdomainSearch, FAQItem, NavMenu } from './ClientComponents';
 
 /* ─────────────── Stats Counter Component ─────────────── */
 function StatItem({ value, label }: { value: string; label: string }) {
@@ -85,7 +15,7 @@ function StatItem({ value, label }: { value: string; label: string }) {
 /* ─────────────── Feature Card Component ─────────────── */
 function FeatureCard({ icon, title, description, delay }: { icon: string; title: string; description: string; delay: number }) {
   return (
-    <div className={`glass-card rounded-3xl p-8 group cursor-default`} style={{ animationDelay: `${delay}ms` }}>
+    <div className={`glass-card rounded-3xl p-8 group cursor-default animate-fade-in-up`} style={{ animationDelay: `${delay}ms` }}>
       <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
         {icon}
       </div>
@@ -134,22 +64,6 @@ function PricingCard({ plan, price, period, features, popular, cta }: { plan: st
   );
 }
 
-/* ─────────────── FAQ Item Component ─────────────── */
-function FAQItem({ question, answer }: { question: string; answer: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="border-b border-white/5">
-      <button onClick={() => setOpen(!open)} className="w-full flex justify-between items-center py-6 text-left group">
-        <span className="text-lg font-semibold text-white group-hover:text-indigo-400 transition-colors pr-4">{question}</span>
-        <span className={`text-2xl text-gray-500 transition-transform duration-300 flex-shrink-0 ${open ? 'rotate-45' : ''}`}>+</span>
-      </button>
-      <div className={`overflow-hidden transition-all duration-500 ${open ? 'max-h-60 pb-6' : 'max-h-0'}`}>
-        <p className="text-gray-400 leading-relaxed">{answer}</p>
-      </div>
-    </div>
-  );
-}
-
 /* ─────────────── Testimonial Card Component ─────────────── */
 function TestimonialCard({ name, role, quote, avatar }: { name: string; role: string; quote: string; avatar: string }) {
   return (
@@ -169,14 +83,8 @@ function TestimonialCard({ name, role, quote, avatar }: { name: string; role: st
 }
 
 /* ═══════════════ MAIN LANDING PAGE ═══════════════ */
-export default function LandingPage() {
-  const [scrollY, setScrollY] = useState(0);
-
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+export default async function LandingPage() {
+  const config = await getLandingConfig();
 
   return (
     <div className="min-h-screen bg-[#050505] text-white relative">
@@ -186,42 +94,23 @@ export default function LandingPage() {
       <div className="glow-orb w-[400px] h-[400px] bg-rose-600/15 bottom-[20%] left-[30%]" style={{ animationDelay: '4s' }} />
 
       {/* ═════ Navigation ═════ */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrollY > 50 ? 'bg-[#050505]/80 backdrop-blur-xl border-b border-white/5' : ''}`}>
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <div className="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center font-black text-sm shadow-lg shadow-indigo-500/20">N</div>
-            <span className="text-xl font-bold tracking-tight">NexId</span>
-          </div>
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium">
-            <a href="#features" className="text-gray-400 hover:text-white transition-colors">Features</a>
-            <a href="#pricing" className="text-gray-400 hover:text-white transition-colors">Pricing</a>
-            <a href="#faq" className="text-gray-400 hover:text-white transition-colors">FAQ</a>
-            <a href="#testimonials" className="text-gray-400 hover:text-white transition-colors">Reviews</a>
-          </div>
-          <div className="flex items-center gap-3">
-            <a href="/auth" className="text-sm text-gray-400 hover:text-white font-medium transition-colors px-4 py-2">Sign In</a>
-            <a href="/app" className="btn-primary text-sm !py-2.5 !px-6">Get Started Free</a>
-          </div>
-        </div>
-      </nav>
+      <NavMenu />
 
       {/* ═════ HERO SECTION ═════ */}
       <section className="relative pt-36 pb-20 px-6 flex flex-col items-center text-center overflow-hidden">
         {/* Trust Badge */}
         <div className="animate-fade-in-up flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-5 py-2 mb-10">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span className="text-sm text-gray-400 font-medium">Trusted by <span className="text-white font-bold">2,400+</span> creators worldwide</span>
+          <span className="text-sm text-gray-400 font-medium">{config.hero.badge} <span className="text-white font-bold">{config.hero.badgeValue}</span> creators worldwide</span>
         </div>
 
         <h1 className="animate-fade-in-up text-5xl md:text-7xl lg:text-8xl font-black tracking-tight max-w-5xl leading-[0.95] mb-8">
-          Your Next Generation{' '}
-          <span className="gradient-text animate-gradient">Identity.</span>
+          {config.hero.title}
+          <span className="gradient-text animate-gradient">{config.hero.titleHighlight}</span>
         </h1>
 
         <p className="animate-fade-in-up-delay-1 text-lg md:text-xl text-gray-400 max-w-2xl leading-relaxed mb-12">
-          Build stunning, animated portfolio websites in minutes — not hours.
-          Claim your unique <span className="text-white font-semibold">yourname.nexid.in</span> subdomain
-          and showcase your work with premium cinematic animations.
+          {config.hero.description}
         </p>
 
         {/* Subdomain Search */}
@@ -229,10 +118,9 @@ export default function LandingPage() {
 
         {/* Social Proof Stats */}
         <div className="flex flex-wrap justify-center gap-8 md:gap-16 mt-20 animate-fade-in-up-delay-3">
-          <StatItem value="2.4K+" label="Active Portfolios" />
-          <StatItem value="99.9%" label="Uptime SLA" />
-          <StatItem value="<1s" label="Load Time" />
-          <StatItem value="4.9★" label="User Rating" />
+          {config.stats.map((s, i) => (
+            <StatItem key={i} value={s.value} label={s.label} />
+          ))}
         </div>
       </section>
 
@@ -246,12 +134,9 @@ export default function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <FeatureCard icon="⚡" title="Lightning Fast Deploy" description="Go live in under 60 seconds. Edit your bio, add projects, pick an animation preset, and publish instantly." delay={0} />
-            <FeatureCard icon="🎨" title="Cinematic Animations" description="Choose from Fade, Slide, Bounce, and more. Scroll-triggered effects and smooth transitions make your portfolio come alive." delay={100} />
-            <FeatureCard icon="🌐" title="Custom Subdomain" description="Claim yourname.nexid.in for free — or connect your own .com, .io, or .dev domain with one-click DNS setup." delay={200} />
-            <FeatureCard icon="🛡️" title="Enterprise Security" description="Edge-level protection, encrypted API tunnels, and role-based access control ensure your data and identity stay safe." delay={300} />
-            <FeatureCard icon="📊" title="Built-in Analytics" description="Track visitors, page views, and engagement metrics for every portfolio page right from your dashboard." delay={400} />
-            <FeatureCard icon="🎧" title="Priority Support" description="Dedicated ticket system with unique IDs. Pro users get front-of-queue priority with staff-only escalation." delay={500} />
+            {config.features.map((f, i) => (
+              <FeatureCard key={i} icon={f.icon} title={f.title} description={f.description} delay={i * 100} />
+            ))}
           </div>
         </div>
       </section>
@@ -265,11 +150,7 @@ export default function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { step: '01', title: 'Claim Your Identity', desc: 'Search and reserve your unique nexid.in subdomain. It takes 10 seconds.' },
-              { step: '02', title: 'Build Your Portfolio', desc: 'Use our visual builder to add your bio, projects, social links, and select animation presets.' },
-              { step: '03', title: 'Go Live Instantly', desc: 'Hit publish and your animated portfolio is live worldwide with SSL and CDN protection.' },
-            ].map((item, i) => (
+            {config.process.map((item, i) => (
               <div key={i} className="relative text-center group">
                 <div className="text-7xl font-black text-white/[0.03] mb-4 group-hover:text-indigo-500/10 transition-colors duration-500">{item.step}</div>
                 <h3 className="text-xl font-bold mb-3 -mt-8 relative z-10">{item.title}</h3>
@@ -291,47 +172,26 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <PricingCard
-              plan="Basic Profile"
-              price="Free"
+              plan={config.pricing.plan1.name}
+              price={config.pricing.plan1.price}
               period="forever"
-              features={[
-                'Basic nexid.in subdomain',
-                'Only 1 Project Slot',
-                'NexId Watermark on Profile',
-                'No Custom Domains',
-                'No Analytics'
-              ]}
-              cta="Create Free Profile"
+              features={config.pricing.plan1.features}
+              cta={config.pricing.plan1.cta}
             />
             <PricingCard
-              plan="NexId Pro"
-              price="₹799"
+              plan={config.pricing.plan2.name}
+              price={config.pricing.plan2.price}
               period="year"
               popular
-              features={[
-                'Unlimited Projects & Experience',
-                'Connect Custom .com Domain',
-                'Premium Animations & Themes',
-                'Remove NexId Watermarks',
-                'Audience Analytics + Contact Inbox',
-                'Priority Verification',
-              ]}
-              cta="Upgrade to Pro"
+              features={config.pricing.plan2.features}
+              cta={config.pricing.plan2.cta}
             />
             <PricingCard
-              plan="Done-For-You"
-              price="₹4,999"
+              plan={config.pricing.plan3.name}
+              price={config.pricing.plan3.price}
               period="project"
-              features={[
-                'We Build Your Website for You',
-                'Custom Design & Architecture',
-                '1 Year Pro Hosting Included',
-                'Free .com Domain Name',
-                'E-commerce & Agency Integration',
-                '1-on-1 Account Manager',
-                'Monthly Maintenance'
-              ]}
-              cta="Hire Our Developers"
+              features={config.pricing.plan3.features}
+              cta={config.pricing.plan3.cta}
             />
           </div>
         </div>
@@ -346,10 +206,9 @@ export default function LandingPage() {
           </div>
 
           <div className="flex gap-6 overflow-x-auto pb-6 scrollbar-hide snap-x">
-            <TestimonialCard name="Arjun Mehta" role="Full Stack Developer" quote="NexId made my portfolio look like a million bucks. The animations are buttery smooth and I had it live in under 5 minutes." avatar="A" />
-            <TestimonialCard name="Priya Sharma" role="UI/UX Designer" quote="The subdomain claiming feature is genius. priya.nexid.in looks so clean and professional. My clients love it." avatar="P" />
-            <TestimonialCard name="Rahul Gupta" role="CS Student" quote="As a student, the free tier is perfect. I got a professional portfolio without spending a rupee. The animation presets are top-notch." avatar="R" />
-            <TestimonialCard name="Sneha Iyer" role="Freelance Developer" quote="Custom domain mapping was seamless. NexId is the best portfolio platform — simple, fast, and beautiful." avatar="S" />
+            {config.testimonials.map((t, i) => (
+              <TestimonialCard key={i} name={t.name} role={t.role} quote={t.quote} avatar={t.avatar} />
+            ))}
           </div>
         </div>
       </section>
@@ -363,12 +222,9 @@ export default function LandingPage() {
           </div>
 
           <div>
-            <FAQItem question="Is NexId really free to start?" answer="Yes! Our Starter plan is completely free forever. You get a unique subdomain, up to 3 projects, and 2 animation presets. No credit card required." />
-            <FAQItem question="How do I connect my own custom domain?" answer="On the Pro plan, head to your Builder dashboard, navigate to Domain Settings, and add a CNAME record pointing to nexid.in. We handle SSL automatically." />
-            <FAQItem question="What animation presets are available?" answer="Free users get Fade and Slide. Pro users unlock Bounce, Scale, Stagger, Parallax scroll, and custom cinema-quality animations. We're always adding new ones." />
-            <FAQItem question="How does the payment system work?" answer="We use a manual UTR payment verification system optimized for Indian users. Upload your payment screenshot and UTR number, and our admin team verifies it within a few hours." />
-            <FAQItem question="Can I export my portfolio?" answer="Yes! Pro and Enterprise users can export their portfolio as a static HTML bundle that can be hosted anywhere." />
-            <FAQItem question="What happens if my plan expires?" answer="We give you a 24-hour grace period. After that, your portfolio will show a friendly 'Plan Expired' page. Your data is never deleted — simply renew to restore everything instantly." />
+            {config.faqs.map((f, i) => (
+              <FAQItem key={i} question={f.question} answer={f.answer} />
+            ))}
           </div>
         </div>
       </section>
@@ -378,10 +234,10 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto text-center relative">
           <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/10 via-purple-600/10 to-rose-600/10 rounded-3xl blur-3xl"></div>
           <div className="relative glass-card rounded-3xl p-16 hover:transform-none">
-            <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-6">Ready to Build Your Identity?</h2>
-            <p className="text-gray-400 text-lg mb-10 max-w-xl mx-auto">Join thousands of creators who've already claimed their space on the internet.</p>
+            <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-6">{config.cta.title}</h2>
+            <p className="text-gray-400 text-lg mb-10 max-w-xl mx-auto">{config.cta.description}</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="/app" className="btn-primary text-base !py-4 !px-10">
+              <a href="/auth" className="btn-primary text-base !py-4 !px-10">
                 Start Building — It's Free
               </a>
               <a href="#features" className="btn-secondary text-base !py-4 !px-10">

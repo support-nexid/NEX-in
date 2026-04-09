@@ -11,6 +11,17 @@ export const metadata: Metadata = {
   },
 };
 
+import RequiresVerification from '@/components/RequiresVerification';
+import RequiresOnboarding from '@/components/RequiresOnboarding';
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  return <AuthProvider>{children}</AuthProvider>;
+  return (
+    <AuthProvider>
+      <RequiresVerification>
+        <RequiresOnboarding>
+          {children}
+        </RequiresOnboarding>
+      </RequiresVerification>
+    </AuthProvider>
+  );
 }

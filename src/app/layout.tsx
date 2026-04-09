@@ -104,6 +104,15 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (typeof window !== 'undefined' && window.location.hostname === 'www.nexid.in') {
+                window.location.replace(window.location.href.replace('www.nexid.in', 'nexid.in'));
+              }
+            `
+          }}
+        />
       </head>
       <body className="antialiased overflow-x-hidden font-['Inter',system-ui,sans-serif]">
         {children}

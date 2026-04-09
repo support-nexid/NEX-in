@@ -164,7 +164,7 @@ export default function ChatPage({ params }: { params: { subdomain: string } }) 
         )}
       </footer>
 
-      {showAuthModal && <VisitorAuthModal onClose={() => setShowAuthModal(false)} />}
+      {showAuthModal && <VisitorAuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />}
     </div>
   );
 }

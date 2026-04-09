@@ -20,7 +20,7 @@ export default function VisitorAuthModal({ isOpen, onClose, title = "Sign in to 
     setLoading(true);
     try {
       await signInWithGoogle();
-      onClose();
+      window.location.href = '/app';
     } catch (error) {
       console.error(error);
       alert("Sign in failed. Please try again or check pop-up settings.");

@@ -4,7 +4,7 @@ import { withAuth } from '@/lib/auth-wrapper';
 import { Resend } from 'resend';
 
 // Setup Resend using our server keys
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY || 're_mock_key_to_prevent_build_crashes');
 
 // The `internal` auth layer ensures only scripts carrying the local cryptographic keys can execute this mass-scan
 export const POST = withAuth(['internal'], async (req) => {

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { syncGetDocs } from '@/lib/db-sync';
+import { syncGetDocs, syncSetDoc, syncSubscribe } from '@/lib/db-sync';
 
 /* ─────── Sidebar Items ─────── */
 const sidebarItems = [
@@ -526,6 +526,204 @@ function Placeholder({ title, desc, icon }: { title: string; desc: string; icon:
   );
 }
 
+/* ═════ Live Chat ═════ */
+function ChatView() {
+  const [sessions, setSessions] = useState<any[]>([]);
+  const [activeSession, setActiveSession] = useState<any | null>(null);
+
+  useEffect(() => {
+    const unsub = syncSubscribe('chat_sessions', [], (data) => setSessions(data));
+    return () => unsub();
+  }, []);
+
+  return (
+    <div className="space-y-6 flex flex-col h-[calc(100vh-8rem)]">
+      <div>
+        <h1 className="text-3xl font-black">Live Chat</h1>
+        <p className="text-gray-500">Real-time chat with active visitors.</p>
+      </div>
+      <div className="flex-1 glass-card rounded-2xl flex overflow-hidden border border-white/5">
+        {/* Session List */}
+        <div className="w-80 border-r border-white/5 flex flex-col bg-black/20">
+          <div className="p-4 border-b border-white/5"><h3 className="font-bold">Active Sessions ({sessions.length})</h3></div>
+          <div className="flex-1 overflow-y-auto">
+            {sessions.length === 0 ? <div className="p-8 text-center text-gray-500 text-sm">No active chats</div> :
+              sessions.map(s => (
+                <div key={s.id} onClick={() => setActiveSession(s)} className={`p-4 border-b border-white/5 cursor-pointer hover:bg-white/[0.02] ${activeSession?.id === s.id ? 'bg-indigo-500/10 border-l-2 border-l-indigo-500' : ''}`}>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="font-bold text-sm text-white">{s.visitorName || 'Anonymous Visitor'}</span>
+                    <span className="text-[10px] text-gray-500">{new Date(s.lastActive || Date.now()).toLocaleTimeString()}</span>
+                  </div>
+                  <p className="text-xs text-gray-400 truncate">{s.lastMessage || 'Connected'}</p>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+        {/* Chat Area */}
+        <div className="flex-1 flex flex-col">
+          {activeSession ? (
+            <>
+              <div className="p-5 border-b border-white/5 bg-black/40 flex justify-between items-center">
+                <div>
+                  <h3 className="font-bold text-white">{activeSession.visitorName || 'Anonymous Visitor'}</h3>
+                  <span className="text-xs text-emerald-400">● Online</span>
+                </div>
+                <button className="text-xs bg-rose-500/10 text-rose-400 px-3 py-1.5 rounded-lg font-bold">End Session</button>
+              </div>
+              <div className="flex-1 p-6 overflow-y-auto space-y-4">
+                {/* Mock Messages */}
+                <div className="flex flex-col gap-1 items-start">
+                  <div className="bg-white/10 text-white p-3 rounded-2xl rounded-tl-sm text-sm max-w-[80%]">Hi, I need help with my domain.</div>
+                  <span className="text-[10px] text-gray-500">10:42 AM</span>
+                </div>
+              </div>
+              <div className="p-4 border-t border-white/5 bg-black/20">
+                <div className="flex gap-2">
+                  <input className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white text-sm focus:border-indigo-500/50 outline-none" placeholder="Type a message..." />
+                  <button className="bg-indigo-500 hover:bg-indigo-600 text-white px-5 rounded-xl font-bold text-sm transition-colors">Send</button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="flex-1 flex items-center justify-center text-gray-500">Select a session to start chatting</div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ═════ Email Support ═════ */
+function EmailView() {
+  const emails = [
+    { id: '1', from: 'dev@example.com', subject: 'Pre-sales inquiry', date: 'Today, 2:30 PM', read: false },
+    { id: '2', from: 'billing@corp.com', subject: 'Invoice #10023 payment failed', date: 'Yesterday', read: true },
+  ];
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-black">Email Support</h1>
+          <p className="text-gray-500">Inbox for support@nexid.in.</p>
+        </div>
+        <button className="btn-primary !rounded-xl text-sm">Compose</button>
+      </div>
+      <div className="glass-card rounded-2xl overflow-hidden border border-white/5">
+        {emails.map(e => (
+          <div key={e.id} className={`p-4 border-b border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer hover:bg-white/[0.02] ${e.read ? 'opacity-70' : 'bg-white/[0.03]'}`}>
+            <div className="flex items-center gap-4 flex-1 min-w-0">
+              {!e.read && <div className="w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0"></div>}
+              {e.read && <div className="w-2 h-2 rounded-full flex-shrink-0"></div>}
+              <div>
+                <div className={`text-sm mb-0.5 ${e.read ? 'text-gray-300' : 'text-white font-bold'}`}>{e.from}</div>
+                <div className="text-sm text-gray-400 truncate w-full">{e.subject}</div>
+              </div>
+            </div>
+            <span className="text-xs text-gray-500 whitespace-nowrap pl-6 md:pl-0">{e.date}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ═════ Knowledge Base ═════ */
+function KnowledgeBaseView() {
+  const [articles, setArticles] = useState<any[]>([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editorData, setEditorData] = useState({ title: '', content: '' });
+
+  useEffect(() => {
+    syncGetDocs('help_articles').then(setArticles);
+  }, []);
+
+  const handleSave = async () => {
+    await syncSetDoc('help_articles', Date.now().toString(), editorData);
+    setEditorData({ title: '', content: '' });
+    setIsEditing(false);
+    syncGetDocs('help_articles').then(setArticles);
+  };
+
+  if (isEditing) {
+    return (
+      <div className="space-y-6 max-w-3xl">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">Write Article</h1>
+          <div className="flex gap-2">
+            <button onClick={() => setIsEditing(false)} className="px-5 py-2 text-sm text-gray-400 hover:text-white">Cancel</button>
+            <button onClick={handleSave} className="btn-primary !rounded-xl text-sm px-6">Publish</button>
+          </div>
+        </div>
+        <input value={editorData.title} onChange={e => setEditorData({...editorData, title: e.target.value})} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 font-bold text-xl focus:border-indigo-500/50 outline-none" placeholder="Article Title" />
+        <textarea value={editorData.content} onChange={e => setEditorData({...editorData, content: e.target.value})} className="w-full h-96 bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-indigo-500/50 outline-none leading-relaxed resize-none" placeholder="Write markdown content here..."></textarea>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-black">Knowledge Base</h1>
+          <p className="text-gray-500">Manage public help articles.</p>
+        </div>
+        <button onClick={() => setIsEditing(true)} className="btn-primary !rounded-xl text-sm px-5">+ New Article</button>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {articles.length === 0 && <div className="col-span-full p-8 text-center text-gray-500 glass-card rounded-2xl">No articles published yet.</div>}
+        {articles.map(a => (
+          <div key={a.id} className="glass-card rounded-2xl p-6 hover:border-indigo-500/30 transition-colors">
+            <h3 className="font-bold text-white mb-2">{a.title}</h3>
+            <p className="text-sm text-gray-500 line-clamp-3">{a.content}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ═════ Support Settings ═════ */
+function SettingsView() {
+  return (
+    <div className="space-y-8 max-w-2xl">
+      <div>
+        <h1 className="text-3xl font-black">Support Settings</h1>
+        <p className="text-gray-500">SLA configurations and team preferences.</p>
+      </div>
+      
+      <div className="glass-card rounded-2xl p-8 space-y-6">
+        <h3 className="text-lg font-bold">Service Level Agreements (SLA)</h3>
+        <div className="space-y-4">
+          <div>
+            <label className="text-sm text-gray-400 font-semibold block mb-2">Pro Tier Response Target (hours)</label>
+            <input type="number" defaultValue={2} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-indigo-500/50" />
+          </div>
+          <div>
+            <label className="text-sm text-gray-400 font-semibold block mb-2">Enterprise Response Target (hours)</label>
+            <input type="number" defaultValue={1} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-indigo-500/50" />
+          </div>
+        </div>
+      </div>
+
+      <div className="glass-card rounded-2xl p-8 space-y-6">
+        <h3 className="text-lg font-bold">Auto-Assignment Rules</h3>
+        <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5">
+          <div>
+            <div className="font-bold text-sm mb-1">Round Robin Assignment</div>
+            <div className="text-xs text-gray-500">Automatically distribute new tickets equally among online agents</div>
+          </div>
+          <div className="w-10 h-6 bg-indigo-500 rounded-full relative cursor-pointer flex-shrink-0">
+             <div className="w-4 h-4 bg-white rounded-full absolute right-1 top-1"></div>
+          </div>
+        </div>
+      </div>
+      
+      <button className="btn-primary !rounded-xl w-full">Save Changes</button>
+    </div>
+  );
+}
+
 /* ═══════════════ MAIN SUPPORT PANEL ═══════════════ */
 export default function SupportDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -541,10 +739,10 @@ export default function SupportDashboard() {
       case 'lookup': return <CustomerLookupView />;
       case 'canned': return <CannedResponsesView />;
       case 'performance': return <PerformanceView />;
-      case 'chat': return <Placeholder title="Live Chat" desc="Real-time chat interface for incoming support sessions." icon="💬" />;
-      case 'email': return <Placeholder title="Email Support" desc="Integrated email client for support@nexid.in." icon="📧" />;
-      case 'kb': return <Placeholder title="Knowledge Base" desc="Self-serve help articles and FAQs for users." icon="📚" />;
-      case 'settings': return <Placeholder title="Support Settings" desc="SLA rules, auto-assignment, and notification preferences." icon="⚙️" />;
+      case 'chat': return <ChatView />;
+      case 'email': return <EmailView />;
+      case 'kb': return <KnowledgeBaseView />;
+      case 'settings': return <SettingsView />;
       default: return <OverviewView />;
     }
   };

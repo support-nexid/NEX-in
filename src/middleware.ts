@@ -11,6 +11,11 @@ export function middleware(request: NextRequest) {
   const rootDomain = 'nexid.in'; 
   const isLocalhost = hostname.includes('localhost');
 
+  // --- Strict WWW Redirect (Resolves Auth Origin Mismatch & SEO issues) ---
+  if (hostname === `www.${rootDomain}`) {
+    return NextResponse.redirect(new URL(`https://${rootDomain}${url.pathname}${url.search}`, request.url));
+  }
+
   let subdomain = '';
   if (hostname.endsWith(`.${rootDomain}`)) {
     subdomain = hostname.replace(`.${rootDomain}`, '');

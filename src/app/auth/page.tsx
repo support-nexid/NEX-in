@@ -24,7 +24,7 @@ export default function AuthPage() {
 
       if (mode === 'login') {
         await signInWithEmailAndPassword(auth, email, password);
-        window.location.href = '/';
+        window.location.href = '/app';
       } else {
         if (!name || !username) {
           setError('Name and username are required.');
@@ -47,7 +47,9 @@ export default function AuthPage() {
           is_active: true,
           createdAt: serverTimestamp(),
         });
-        window.location.href = '/';
+        const { sendEmailVerification } = await import('firebase/auth');
+        await sendEmailVerification(cred.user);
+        window.location.href = '/app';
       }
     } catch (err: any) {
       const msg = err?.code === 'auth/email-already-in-use' ? 'This email is already registered.'

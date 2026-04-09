@@ -52,11 +52,11 @@ try {
 export async function syncSetDoc(collectionName: string, docId: string, data: any) {
   if (!db1) throw new Error("DB1 is offline");
 
-  const p1 = setDoc(doc(db1, collectionName, docId), data);
+  const p1 = setDoc(doc(db1, collectionName, docId), data, { merge: true });
   const promises = [p1];
 
   if (db2) {
-    promises.push(setDoc(doc(db2, collectionName, docId), data));
+    promises.push(setDoc(doc(db2, collectionName, docId), data, { merge: true }));
   }
 
   // Promise.allSettled ensures it doesn't fail if just DB2 goes down.

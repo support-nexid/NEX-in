@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { syncGetDocs } from '@/lib/db-sync';
+import { syncGetDocs, syncGetDoc, syncSetDoc } from '@/lib/db-sync';
+import { LandingConfig, defaultLandingConfig } from '@/lib/default-landing';
 
 /* ─────── Sidebar Items ─────── */
 const sidebarItems = [
@@ -685,6 +686,186 @@ function RevenueView() {
   );
 }
 
+/* ═════ Landing Page CMS ═════ */
+function LandingCMSView() {
+  const [config, setConfig] = useState<LandingConfig>(defaultLandingConfig);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    async function fetchConfig() {
+      try {
+        const data = await syncGetDoc('system_config', 'landing_page');
+        if (data) {
+          // Merge with default to handle missing fields
+          const merged = { ...defaultLandingConfig, ...data } as LandingConfig;
+          setConfig(merged);
+        }
+      } catch (e) {
+        console.error("Failed to fetch landing config", e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchConfig();
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await syncSetDoc('system_config', 'landing_page', config);
+      alert("Landing page configuration saved successfully!");
+    } catch (e) {
+      console.error("Save failed", e);
+      alert("Failed to save configuration.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const updateSection = (section: keyof LandingConfig, field: string, value: string) => {
+    setConfig((prev) => ({
+      ...prev,
+      [section]: {
+        ...(prev[section] as any),
+        [field]: value,
+      },
+    }));
+  };
+
+  if (loading) return <div className="p-8 animate-pulse text-gray-500">Loading Configuration...</div>;
+
+  return (
+    <div className="space-y-8 pb-20">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-black">Landing Page CMS</h1>
+          <p className="text-gray-500">Update the public landing page content in real-time.</p>
+        </div>
+        <button 
+          onClick={handleSave} 
+          disabled={saving}
+          className="btn-primary !rounded-xl text-sm px-8 py-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50"
+        >
+          {saving ? 'Saving...' : 'Save All Changes'}
+        </button>
+      </div>
+
+      {/* Hero Section */}
+      <div className="glass-card rounded-2xl p-8 hover:transform-none">
+        <h3 className="text-lg font-bold mb-6 flex items-center gap-2"><span>🚀</span> Hero Section</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Badge Text</label>
+            <input 
+              value={config.hero.badge} 
+              onChange={(e) => updateSection('hero', 'badge', e.target.value)}
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-indigo-500/50 focus:outline-none" 
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Badge Value</label>
+            <input 
+              value={config.hero.badgeValue} 
+              onChange={(e) => updateSection('hero', 'badgeValue', e.target.value)}
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-indigo-500/50 focus:outline-none" 
+            />
+          </div>
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Main Title</label>
+            <input 
+              value={config.hero.title} 
+              onChange={(e) => updateSection('hero', 'title', e.target.value)}
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-indigo-500/50 focus:outline-none" 
+            />
+          </div>
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Highlighted Text</label>
+            <input 
+              value={config.hero.titleHighlight} 
+              onChange={(e) => updateSection('hero', 'titleHighlight', e.target.value)}
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-indigo-400 font-bold focus:border-indigo-500/50 focus:outline-none" 
+            />
+          </div>
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Description</label>
+            <textarea 
+              rows={3}
+              value={config.hero.description} 
+              onChange={(e) => updateSection('hero', 'description', e.target.value)}
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-indigo-500/50 focus:outline-none text-sm leading-relaxed" 
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* CTA Section */}
+      <div className="glass-card rounded-2xl p-8 hover:transform-none">
+        <h3 className="text-lg font-bold mb-6 flex items-center gap-2"><span>🎯</span> Contact/CTA Section</h3>
+        <div className="grid grid-cols-1 gap-6">
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">CTA Title</label>
+            <input 
+              value={config.cta.title} 
+              onChange={(e) => updateSection('cta', 'title', e.target.value)}
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-indigo-500/50 focus:outline-none" 
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">CTA Description</label>
+            <input 
+              value={config.cta.description} 
+              onChange={(e) => updateSection('cta', 'description', e.target.value)}
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-indigo-500/50 focus:outline-none" 
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Advanced Configuration */}
+      <div className="glass-card rounded-2xl p-8 border-rose-500/10 hover:transform-none mt-8">
+        <h3 className="text-lg font-bold mb-6 flex items-center gap-2 text-rose-400"><span>⚙️</span> Advanced Configuration (API & CORS)</h3>
+        <p className="text-sm text-gray-400 mb-6">Manage system-wide environment variables, API whitelists, and cross-origin resource sharing policies.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+           <div className="space-y-2 col-span-2">
+            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">CORS Allowed Origins (Comma Separated)</label>
+            <input 
+              defaultValue="https://nexid.in, https://app.nexid.in"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-indigo-500/50 focus:outline-none font-mono text-sm" 
+            />
+          </div>
+          <div className="space-y-2">
+             <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Payments API Webhook Secret</label>
+             <input 
+              type="password"
+              defaultValue="sk_test_123456789"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-indigo-500/50 focus:outline-none font-mono text-sm" 
+            />
+          </div>
+          <div className="space-y-2">
+             <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Internal Microservice Token</label>
+             <input 
+              type="password"
+              defaultValue="nexid_internal_token"
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-indigo-500/50 focus:outline-none font-mono text-sm" 
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-end p-4 mt-8">
+        <button 
+          onClick={handleSave} 
+          disabled={saving}
+          className="btn-primary !rounded-xl text-sm px-12 py-4 shadow-xl shadow-indigo-500/20"
+        >
+          {saving ? 'Saving...' : 'Save All Configuration'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /* ═══════════════ MAIN ADMIN PANEL ═══════════════ */
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -702,7 +883,7 @@ export default function AdminDashboard() {
       case 'expired': return <ExpiredView />;
       case 'revenue': return <RevenueView />;
       case 'traffic': return <TrafficView />;
-      case 'system': return <div className="space-y-8"><div><h1 className="text-3xl font-black">System Settings</h1><p className="text-gray-500">Platform configuration and maintenance.</p></div><div className="glass-card rounded-2xl p-16 hover:transform-none text-center"><div className="text-5xl mb-4">⚙️</div><h2 className="text-xl font-bold mb-2">System Configuration</h2><p className="text-gray-500">Database rules, CORS, and API config management coming soon.</p></div></div>;
+      case 'system': return <LandingCMSView />;
       default: return <OverviewView />;
     }
   };
