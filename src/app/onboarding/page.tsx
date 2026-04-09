@@ -6,7 +6,6 @@ import { syncSetDoc } from '@/lib/db-sync';
 import ImageUpload from '@/components/ImageUpload';
 import NexAiIcon from '@/components/NexAiIcon';
 import { useRouter } from 'next/navigation';
-import MobileBlocker from '@/components/MobileBlocker';
 
 export default function OnboardingPage() {
   const { user, profile, loading } = useAuth();
@@ -92,8 +91,6 @@ export default function OnboardingPage() {
   };
 
   return (
-    <>
-    <MobileBlocker />
     <div className="min-h-screen bg-[#050505] flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 pointer-events-none">
@@ -174,6 +171,5 @@ export default function OnboardingPage() {
         </div>
       </div>
     </div>
-    </>
   );
 }
