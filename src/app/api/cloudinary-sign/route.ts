@@ -11,13 +11,21 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const folder = searchParams.get('folder') || '';
+    const upload_preset = searchParams.get('preset') || '';
+    
     const timestamp = Math.round(new Date().getTime() / 1000);
+
+    const paramsToSign: Record<string, any> = { timestamp };
+    if (folder) paramsToSign.folder = folder;
+    if (upload_preset) paramsToSign.upload_preset = upload_preset;
 
     // Create secure signature required by Cloudinary
     const signature = cloudinary.utils.api_sign_request(
-      { timestamp },
+      paramsToSign,
       process.env.CLOUDINARY_API_SECRET || ''
     );
 

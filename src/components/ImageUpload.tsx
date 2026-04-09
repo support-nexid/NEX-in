@@ -21,7 +21,11 @@ export default function ImageUpload({ onSuccess, className = "", folder = "", bu
 
     try {
       // 1. Get Signature from backend
-      const sigRes = await fetch('/api/cloudinary-sign');
+      const queryParams = new URLSearchParams();
+      if (preset) queryParams.append('preset', preset);
+      if (folder) queryParams.append('folder', folder);
+      
+      const sigRes = await fetch(`/api/cloudinary-sign?${queryParams.toString()}`);
       if (!sigRes.ok) throw new Error("Failed to get signature");
       const { timestamp, signature, apiKey, cloudName } = await sigRes.json();
 
@@ -31,7 +35,8 @@ export default function ImageUpload({ onSuccess, className = "", folder = "", bu
       formData.append('api_key', apiKey);
       formData.append('timestamp', timestamp);
       formData.append('signature', signature);
-      formData.append('upload_preset', preset);
+      if (preset) formData.append('upload_preset', preset);
+      if (folder) formData.append('folder', folder);
 
       const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
         method: 'POST',
