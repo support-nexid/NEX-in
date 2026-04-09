@@ -132,6 +132,22 @@ export default function OnboardingPage() {
                 placeholder="I am a Graphic Designer who loves 3D rendering and dark mode aesthetics..." 
                 className="w-full h-32 bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-gray-600 focus:border-indigo-500/50 focus:bg-white/10 focus:-translate-y-1 focus:outline-none transition-all text-sm resize-none" 
               />
+              {/* Quick Prompt Suggestions */}
+              <div className="mt-3 flex flex-wrap gap-2">
+                {[
+                  { label: "🧑‍💻 Web Developer", text: `I am ${user?.displayName?.split(' ')[0] || 'a'}, a Full Stack Developer specializing in React, Next.js, and clean UI design.` },
+                  { label: "🎨 Designer", text: `I am ${user?.displayName?.split(' ')[0] || 'a'}, a UI/UX & Graphic Designer passionate about modern layouts and 3D aesthetics.` },
+                  { label: "📈 Marketer", text: `I am ${user?.displayName?.split(' ')[0] || 'a'}, a Digital Marketer focusing on SEO, growth hacking, and conversion optimization.` }
+                ].map((suggestion) => (
+                  <button 
+                    key={suggestion.label} 
+                    onClick={() => setPrompt(suggestion.text)}
+                    className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-xs text-gray-400 hover:text-white hover:border-indigo-500/50 hover:bg-white/10 transition-all font-medium"
+                  >
+                    {suggestion.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
