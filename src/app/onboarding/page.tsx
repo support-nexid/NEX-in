@@ -91,7 +91,7 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-[100dvh] bg-[#050505] flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-indigo-500/8 rounded-full blur-[150px]"></div>
