@@ -24,7 +24,7 @@ Critical: Failed to initialize DB1 x [FirebaseError]: Firebase: Error (auth/inva
     at tx (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\chunks\676.js:3:419063)
     at 11964 (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\chunks\414.js:1:1093)
     at t (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\webpack-runtime.js:1:143)
-    at 38853 (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\app\onboarding\page.js:1:12295) {
+    at 38853 (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\app\onboarding\page.js:1:12394) {
   code: 'auth/invalid-api-key',
   customData: { appName: '[DEFAULT]' }
 }
@@ -89,7 +89,7 @@ Route (app)                              Size     First Load JS
 ├ ƒ /chat/[subdomain]                    4.88 kB         207 kB
 ├ ƒ /icon                                0 B                0 B
 ├ ○ /landing                             3.37 kB         205 kB
-├ ○ /onboarding                          5.21 kB         207 kB
+├ ○ /onboarding                          5.23 kB         207 kB
 ├ ƒ /opengraph-image                     0 B                0 B
 ├ ƒ /portfolio/[subdomain]               6.69 kB         209 kB
 ├ ○ /robots.txt                          0 B                0 B

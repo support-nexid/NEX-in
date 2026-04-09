@@ -20,12 +20,19 @@ export default function NexAiIcon({ className = "w-16 h-16", isProcessing = fals
       {/* Center Core */}
       <div className={`relative w-2/3 h-2/3 bg-gradient-to-br from-[#050505] to-[#111] rounded-full border border-white/10 flex items-center justify-center shadow-inner transition-all duration-500 ${isProcessing ? 'shadow-[0_0_30px_rgba(139,92,246,0.3)] border-indigo-500/50 scale-105' : ''}`}>
         
-        {/* Core Gradient Diamond/Sparkle */}
-        <div className={`absolute inset-0 bg-gradient-to-tr from-indigo-500/40 to-purple-600/40 rounded-full blur-sm transition-all duration-300 ${isProcessing ? 'opacity-100 animate-pulse' : 'opacity-0'}`}></div>
-        
-        <svg viewBox="0 0 24 24" fill="currentColor" className={`w-1/2 h-1/2 transition-colors relative z-10 ${isProcessing ? 'text-white' : 'text-indigo-400'}`}>
-          <path d="M11 2.206l-2.227 5.093-5.093 2.227 5.093 2.227 2.227 5.093 2.227-5.093 5.093-2.227-5.093-2.227-2.227-5.093zm8.5 12.5l-1.113 2.547-2.547 1.113 2.547 1.113 1.113 2.547 1.113-2.547 2.547-1.113-2.547-1.113-1.113-2.547z" />
-        </svg>
+        {/* Stylized Glowing 'N' */}
+        <div className={`relative z-10 flex items-center justify-center w-full h-full transition-all duration-500 ${isProcessing ? 'scale-110' : 'scale-100'}`}>
+          <span className={`font-black text-3xl italic tracking-tighter ${
+            isProcessing 
+              ? 'text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-purple-200 drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' 
+              : 'text-transparent bg-clip-text bg-gradient-to-br from-indigo-400 to-purple-500 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]'
+            }`}
+             style={{ WebkitTextStroke: isProcessing ? '0.5px rgba(255,255,255,0.5)' : 'none' }}>
+            N
+          </span>
+          {/* Subtle accent mark on the N to make it look like a logo */}
+          <span className={`absolute top-2 right-2 w-1.5 h-1.5 rounded-full ${isProcessing ? 'bg-white animate-ping' : 'bg-indigo-400'}`}></span>
+        </div>
       </div>
     </div>
   );
