@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { syncSetDoc } from '@/lib/db-sync';
 import ImageUpload from '@/components/ImageUpload';
+import NexAiIcon from '@/components/NexAiIcon';
 import { useRouter } from 'next/navigation';
 
 export default function OnboardingPage() {
@@ -97,8 +98,9 @@ export default function OnboardingPage() {
         <div className="absolute bottom-1/3 right-1/4 w-[500px] h-[500px] bg-purple-500/8 rounded-full blur-[150px]"></div>
       </div>
 
-      <div className="relative w-full max-w-xl">
-        <div className="text-center mb-10">
+      <div className="relative w-full max-w-xl z-20">
+        <div className="text-center mb-10 flex flex-col items-center">
+          <NexAiIcon className="w-20 h-20 mb-6" isProcessing={saving} />
           <h1 className="text-4xl font-black text-white mb-3">Let's build your portfolio.</h1>
           <p className="text-gray-400">Describe who you are, and NEX-Ai will instantly generate your entire layout, skills, and dummy projects.</p>
         </div>
