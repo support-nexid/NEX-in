@@ -12,7 +12,6 @@ interface Props {
 
 export default function ImageUpload({ onSuccess, className = "", folder = "avatars", buttonLabel = "Upload", preset = "" }: Props) {
   const [uploading, setUploading] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
@@ -65,10 +64,9 @@ export default function ImageUpload({ onSuccess, className = "", folder = "avata
   };
 
   return (
-    <div className={`relative ${className}`} onClick={() => !uploading && inputRef.current?.click()}>
-      <div className="flex items-center justify-center w-full h-full cursor-pointer group">
+    <label className={`block relative cursor-pointer group ${className}`}>
+      <div className="flex items-center justify-center w-full h-full">
         <input 
-          ref={inputRef}
           type="file" 
           accept="image/*" 
           onChange={handleFileChange} 
@@ -82,10 +80,10 @@ export default function ImageUpload({ onSuccess, className = "", folder = "avata
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center transition-opacity opacity-0 bg-black/50 rounded-inherit group-hover:opacity-100">
             <span className="text-xl">📷</span>
-            <span className="text-xs font-semibold text-white">Upload</span>
+            <span className="text-xs font-semibold text-white">{buttonLabel}</span>
           </div>
         )}
       </div>
-    </div>
+    </label>
   );
 }
