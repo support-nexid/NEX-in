@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 
 interface Props {
   onSuccess: (url: string) => void;
@@ -12,6 +12,7 @@ interface Props {
 
 export default function ImageUpload({ onSuccess, className = "", folder = "avatars", buttonLabel = "Upload", preset = "" }: Props) {
   const [uploading, setUploading] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
@@ -64,14 +65,15 @@ export default function ImageUpload({ onSuccess, className = "", folder = "avata
   };
 
   return (
-    <div className={`relative ${className}`}>
-      <label className="flex items-center justify-center w-full h-full cursor-pointer group">
+    <div className={`relative ${className}`} onClick={() => !uploading && inputRef.current?.click()}>
+      <div className="flex items-center justify-center w-full h-full cursor-pointer group">
         <input 
+          ref={inputRef}
           type="file" 
           accept="image/*" 
           onChange={handleFileChange} 
           disabled={uploading}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-50" 
+          className="hidden" 
         />
         {uploading ? (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-inherit">
@@ -83,7 +85,7 @@ export default function ImageUpload({ onSuccess, className = "", folder = "avata
             <span className="text-xs font-semibold text-white">Upload</span>
           </div>
         )}
-      </label>
+      </div>
     </div>
   );
 }
