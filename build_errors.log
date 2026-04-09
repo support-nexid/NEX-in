@@ -14,6 +14,20 @@
    Generating static pages (0/15) ...
    Generating static pages (3/15) 
    Generating static pages (7/15) 
+ ⨯ useSearchParams() should be wrapped in a suspense boundary at page "/404". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\chunks\900.js:1:10766)
+    at d (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\chunks\900.js:1:21658)
+    at d (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\app\_not-found\page.js:1:3907)
+    at nj (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nL (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nM (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:58561)
+    at nL (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+
+Error occurred prerendering page "/_not-found". Read more: https://nextjs.org/docs/messages/prerender-error
+
 Critical: Failed to initialize DB1 x [FirebaseError]: Firebase: Error (auth/invalid-api-key).
     at y (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\chunks\676.js:3:363315)
     at v (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\chunks\676.js:3:363363)
@@ -22,87 +36,44 @@ Critical: Failed to initialize DB1 x [FirebaseError]: Firebase: Error (auth/inva
     at a.initialize (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\chunks\676.js:3:348761)
     at ej (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\chunks\676.js:3:401274)
     at tx (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\chunks\676.js:3:419063)
-    at 11964 (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\chunks\414.js:1:1093)
+    at 11964 (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\app\onboarding\page.js:1:12831)
     at t (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\webpack-runtime.js:1:143)
-    at 38853 (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\app\onboarding\page.js:1:12355) {
+    at 38853 (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\app\onboarding\page.js:1:10449) {
   code: 'auth/invalid-api-key',
   customData: { appName: '[DEFAULT]' }
 }
+ ⨯ useSearchParams() should be wrapped in a suspense boundary at page "/onboarding". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\chunks\900.js:1:10766)
+    at d (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\chunks\900.js:1:21658)
+    at d (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\chunks\105.js:1:2458)
+    at nj (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nL (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nM (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:58561)
+    at nL (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+
+Error occurred prerendering page "/onboarding". Read more: https://nextjs.org/docs/messages/prerender-error
+
    Generating static pages (11/15) 
-Error fetching landing config: Error: Could not load the default credentials. Browse to https://cloud.google.com/docs/authentication/getting-started for more information.
-    at GoogleAuth.getApplicationDefaultAsync (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\google-gax\node_modules\google-auth-library\build\src\auth\googleauth.js:287:15)
-    at async GoogleAuth._GoogleAuth_determineClient (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\google-gax\node_modules\google-auth-library\build\src\auth\googleauth.js:834:32)
-    at async GoogleAuth.getClient (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\google-gax\node_modules\google-auth-library\build\src\auth\googleauth.js:698:20)
-    at async GrpcClient._getCredentials (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\google-gax\build\src\grpc.js:145:24)
-    at async GrpcClient.createStub (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\google-gax\build\src\grpc.js:318:23)
-Caused by: Error
-    at D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@google-cloud\firestore\build\src\index.js:1040:27
-    at D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@google-cloud\firestore\build\src\telemetry\enabled-trace-util.js:110:30
-    at NoopContextManager.with (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@opentelemetry\api\build\src\context\NoopContextManager.js:14:19)
-    at ContextAPI.with (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@opentelemetry\api\build\src\api\context.js:51:46)
-    at NoopTracer.startActiveSpan (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@opentelemetry\api\build\src\trace\NoopTracer.js:54:31)
-    at ProxyTracer.startActiveSpan (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@opentelemetry\api\build\src\trace\ProxyTracer.js:27:24)
-    at EnabledTraceUtil.startActiveSpan (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@google-cloud\firestore\build\src\telemetry\enabled-trace-util.js:102:28)
-    at Firestore.getAll (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@google-cloud\firestore\build\src\index.js:1031:32)
-    at D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@google-cloud\firestore\build\src\reference\document-reference.js:182:36
-    at D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@google-cloud\firestore\build\src\telemetry\enabled-trace-util.js:110:30
-Error fetching landing config: Error: Could not load the default credentials. Browse to https://cloud.google.com/docs/authentication/getting-started for more information.
-    at GoogleAuth.getApplicationDefaultAsync (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\google-gax\node_modules\google-auth-library\build\src\auth\googleauth.js:287:15)
-    at async GoogleAuth._GoogleAuth_determineClient (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\google-gax\node_modules\google-auth-library\build\src\auth\googleauth.js:834:32)
-    at async GoogleAuth.getClient (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\google-gax\node_modules\google-auth-library\build\src\auth\googleauth.js:698:20)
-    at async GrpcClient._getCredentials (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\google-gax\build\src\grpc.js:145:24)
-    at async GrpcClient.createStub (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\google-gax\build\src\grpc.js:318:23)
-Caused by: Error
-    at D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@google-cloud\firestore\build\src\index.js:1040:27
-    at D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@google-cloud\firestore\build\src\telemetry\enabled-trace-util.js:110:30
-    at NoopContextManager.with (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@opentelemetry\api\build\src\context\NoopContextManager.js:14:19)
-    at ContextAPI.with (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@opentelemetry\api\build\src\api\context.js:51:46)
-    at NoopTracer.startActiveSpan (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@opentelemetry\api\build\src\trace\NoopTracer.js:54:31)
-    at ProxyTracer.startActiveSpan (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@opentelemetry\api\build\src\trace\ProxyTracer.js:27:24)
-    at EnabledTraceUtil.startActiveSpan (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@google-cloud\firestore\build\src\telemetry\enabled-trace-util.js:102:28)
-    at Firestore.getAll (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@google-cloud\firestore\build\src\index.js:1031:32)
-    at D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@google-cloud\firestore\build\src\reference\document-reference.js:182:36
-    at D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\@google-cloud\firestore\build\src\telemetry\enabled-trace-util.js:110:30
+ ⨯ useSearchParams() should be wrapped in a suspense boundary at page "/landing". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at o (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\chunks\900.js:1:10766)
+    at d (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\chunks\900.js:1:21658)
+    at d (D:\Alll Websites\Nexid-in\NEXIDMAIN\.next\server\chunks\105.js:1:2458)
+    at nj (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:46252)
+    at nM (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:47572)
+    at nM (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:61547)
+    at nL (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+    at nB (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:67539)
+    at nM (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:58561)
+    at nL (D:\Alll Websites\Nexid-in\NEXIDMAIN\node_modules\next\dist\compiled\next-server\app-page.runtime.prod.js:12:64547)
+
+Error occurred prerendering page "/landing". Read more: https://nextjs.org/docs/messages/prerender-error
+
  ✓ Generating static pages (15/15)
-   Finalizing page optimization ...
-   Collecting build traces ...
 
-Route (app)                              Size     First Load JS
-┌ ○ /_not-found                          873 B          88.4 kB
-├ ƒ /admin                               10.8 kB         213 kB
-├ ƒ /api/cloudinary-sign                 0 B                0 B
-├ ƒ /api/system/admin/approve            0 B                0 B
-├ ƒ /api/system/ai/generate-portfolio    0 B                0 B
-├ ƒ /api/system/cron                     0 B                0 B
-├ ƒ /api/system/health                   0 B                0 B
-├ ƒ /api/system/payments/submit          0 B                0 B
-├ ƒ /api/system/public/check-subdomain   0 B                0 B
-├ ƒ /api/system/public/contact           0 B                0 B
-├ ƒ /api/system/support/tickets          0 B                0 B
-├ ƒ /api/system/user/messages            0 B                0 B
-├ ƒ /api/system/user/portfolio           0 B                0 B
-├ ƒ /api/system/user/profile             0 B                0 B
-├ ƒ /api/system/user/theme               0 B                0 B
-├ ƒ /app                                 18.4 kB         220 kB
-├ ƒ /apple-icon                          0 B                0 B
-├ ƒ /auth                                2.95 kB        90.5 kB
-├ ƒ /chat/[subdomain]                    4.88 kB         207 kB
-├ ƒ /icon                                0 B                0 B
-├ ○ /landing                             3.37 kB         205 kB
-├ ○ /onboarding                          5.24 kB         207 kB
-├ ƒ /opengraph-image                     0 B                0 B
-├ ƒ /portfolio/[subdomain]               6.69 kB         209 kB
-├ ○ /robots.txt                          0 B                0 B
-├ ○ /sitemap.xml                         0 B                0 B
-└ ƒ /support                             9.54 kB         212 kB
-+ First Load JS shared by all            87.5 kB
-  ├ chunks/117-ab227d47861df5d5.js       31.7 kB
-  ├ chunks/fd9d1056-cd900e95e6b0db82.js  53.6 kB
-  └ other shared chunks (total)          2.14 kB
-
-
-ƒ Middleware                             25.7 kB
-
-○  (Static)   prerendered as static content
-ƒ  (Dynamic)  server-rendered on demand
-
+> Export encountered errors on following paths:
+	/_not-found/page: /_not-found
+	/landing/page: /landing
+	/onboarding/page: /onboarding

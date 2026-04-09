@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import PageTransition from "@/components/PageTransition";
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -121,7 +122,9 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased overflow-x-hidden font-['Inter',system-ui,sans-serif]">
-        {children}
+        <PageTransition>
+          {children}
+        </PageTransition>
       </body>
     </html>
   );
