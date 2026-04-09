@@ -43,7 +43,15 @@ export default function ImageUpload({ onSuccess, className = "", folder = "avata
         body: formData,
       });
 
-      if (!uploadRes.ok) throw new Error("Failed to upload to Cloudinary");
+      if (!uploadRes.ok) {
+        let errStr = "Failed to upload to Cloudinary";
+        try {
+          const errData = await uploadRes.json();
+          console.error("Cloudinary Error Payload:", errData);
+          errStr = errData?.error?.message || errStr;
+        } catch(e) {}
+        throw new Error(errStr);
+      }
       const data = await uploadRes.json();
       
       onSuccess(data.secure_url);
